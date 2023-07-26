@@ -1,0 +1,47 @@
+[package]
+name = "async-dropper"
+version = "0.1.0"
+repository = "https://github.com/t3hmrman/async-drop-derive"
+license = "MIT"
+readme = "README.md"
+edition = "2021"
+rust-version = "1.70"
+authors = [
+  "vados <vados@vadosware.io>",
+]
+categories = [
+  "asynchronous",
+]
+description = """
+The least-worst ad-hoc implementation of AsyncDrop as a Derive macro
+"""
+
+[workspace]
+members = [
+  "crates/async-dropper-derive",
+  "crates/async-dropper",
+]
+
+[[example]]
+name = "tokio"
+path = "../examples/async_std.rs"
+crate-type = [ "bin" ]
+required-features = [ "tokio" ]
+
+[[example]]
+name = "async-std"
+path = "../examples/async_std.rs"
+crate-type = [ "bin" ]
+required-features = [ "async-std" ]
+
+[features]
+defaults = ["tokio"]
+tokio = ["dep:tokio", "dep:async-trait"]
+async-std = ["dep:async-std", "dep:async-trait"]
+
+[dependencies]
+anyhow.workspace = true
+thiserror.workspace = true
+async-std.workspace = { workspace = true, optional = true }
+tokio.workspace = { workspace = true, optional = true }
+async-trait.workspace = true
