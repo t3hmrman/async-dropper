@@ -1,27 +1,32 @@
-<h1 align="center">🗑  <code>async-drop-derive</code></h1>
+<h1 align="center">🗑  <code>async-dropper</code></h1>
 
-`async-drop-derive` is probably the least-worst ad-hoc `AsyncDrop` implementation you've seen, as a [derive macro][rust-derive-macro].
+`async-dropper` is probably the least-worst ad-hoc `AsyncDrop` implementation you've seen, as a trait called `AsyncDrop` and corresponding [derive macro][rust-derive-macro].
+
+The code in this crate was most directly inspired by [this StackOverflow thread on Async Drop](https://stackoverflow.com/questions/71541765/rust-async-drop) and many other conversations:
+
+- [Async Drop? - Reddit](https://www.reddit.com/r/rust/comments/vckd9h/async_drop/)
+- [Asynchronous Destructors - rust-lang.org](https://internals.rust-lang.org/t/asynchronous-destructors/11127)
+- [Async Drop roadmap](https://rust-lang.github.io/async-fundamentals-initiative/roadmap/async_drop.html) (once this is done, this crate will be deprecated!)
 
 [rust-derive-macro]: https://doc.rust-lang.org/reference/procedural-macros.html#derive-macros
 
 ## Install
 
 ```console
-cargo add async-drop-derive                      # by default, tokio is enabled
-cargo add async-drop-derive --features async-std # use async-std
+cargo add async-dropper                      # by default, tokio is enabled
+cargo add async-dropper --features async-std # use async-std
 ```
 
 If you're editing `Cargo.toml` by hand:
 
 ```toml
 [dependencies]
-async-drop-derive = "0.1"
-#async-drop-derive = { version = "0.1", features = [ "async-std" ] }
+async-dropper = "0.1"
+#async-dropper = { version = "0.1", features = [ "async-std" ] }
 ```
 
 > **Warning**
-> `async-drop-derive` does not allow using both `async-std` and `tokio` features at the same time (see [the FAQ below](#FAQ)).
-
+> `async-dropper` does not allow using both `async-std` and `tokio` features at the same time (see [the FAQ below](#FAQ)).
 
 ## Quickstart
 
@@ -67,7 +72,7 @@ impl AsyncDrop for ExampleObject {
     }
 
     // NOTE: below was not implemented since we want the default of DropFailAction::Contineue
-    // fn drop_fail_action() -> DropFailAction; 
+    // fn drop_fail_action() -> DropFailAction;
 }
 
 #[tokio::main]
@@ -89,7 +94,7 @@ cargo run --example tokio --features=tokio
 
 ## Supported environments
 
-`async-drop-derive` works with the following async environments:
+`async-dropper` works with the following async environments:
 
 | Name                              | Supported? |
 |-----------------------------------|------------|
@@ -101,7 +106,7 @@ cargo run --example tokio --features=tokio
 
 ## FAQ
 
-### Why does `async-drop-derive` assume that I'm using *either* `async-std` or `tokio`
+### Why does `async-dropper` assume that I'm using *either* `async-std` or `tokio`
 
 Because you probably are. If this is a problem for you, it *can* be changed, please file an issue.
 
@@ -132,4 +137,4 @@ There are a few useful targets like `just build-watch` which will continuously b
 
 ## Contributing
 
-Contributions are welcome! If you find a bug or an impovement that should be included in `async-drop-derive`, [create an issue](https://github.com/t3hmrman/async-drop-derive/issues) or open a pull request.
+Contributions are welcome! If you find a bug or an impovement that should be included in `async-dropper`, [create an issue](https://github.com/t3hmrman/async-dropper/issues) or open a pull request.
