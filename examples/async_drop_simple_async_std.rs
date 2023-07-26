@@ -16,7 +16,7 @@ struct AsyncThing(String);
 impl AsyncDrop for AsyncThing {
     async fn async_drop(&mut self) {
         eprintln!("async dropping [{}]!", self.0);
-        async_std::time::sleep(Duration::from_secs(2)).await;
+        async_std::task::sleep(Duration::from_secs(2)).await;
         eprintln!("dropped [{}]!", self.0);
     }
 }

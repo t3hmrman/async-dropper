@@ -23,7 +23,7 @@ impl AsyncDrop for AsyncThing {
     async fn async_drop(&mut self) -> Result<(), AsyncDropError> {
         // Wait 2 seconds then "succeed"
         eprintln!("async dropping [{}]!", self.0);
-        async_std::future::sleep(Duration::from_secs(2)).await;
+        async_std::task::sleep(Duration::from_secs(2)).await;
         eprintln!("dropped [{}]!", self.0);
         Ok(())
     }

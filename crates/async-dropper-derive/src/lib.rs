@@ -14,7 +14,7 @@ pub fn derive_async_drop(items: proc_macro::TokenStream) -> proc_macro::TokenStr
 fn make_shared_default_name(ident: &proc_macro2::Ident) -> proc_macro2::Ident {
     quote::format_ident!("_shared_default_{}", ident)
 }
-        
+
 /// Default implementation of deriving async drop that does nothing
 /// you're expected to use either the 'tokio' feature or 'async-std'
 fn gen_preamble(DeriveInput { ident, .. }: &DeriveInput) -> proc_macro2::TokenStream {
@@ -24,7 +24,7 @@ fn gen_preamble(DeriveInput { ident, .. }: &DeriveInput) -> proc_macro2::TokenSt
         #[derive(Debug)]
         pub enum AsyncDropError {
             UnexpectedError(Box<dyn std::error::Error>),
-            Timeout(async_dropper::tokio::time::error::Elapsed),
+            Timeout,
         }
 
         /// What to do when a drop fails
@@ -113,8 +113,6 @@ fn gen_impl(DeriveInput { ident, .. }: &DeriveInput) -> proc_macro2::TokenStream
 
                 // Perform a synchronous wait
                 ::futures::executor::block_on(task).unwrap();
-
-                drop(self);
             }
         }
     )
@@ -123,14 +121,16 @@ fn gen_impl(DeriveInput { ident, .. }: &DeriveInput) -> proc_macro2::TokenStream
 
 /// async-std  implementation of AsyncDrop
 #[cfg(feature = "async-std")]
-fn gen_impl(DeriveInput { ident, ..}: &DeriveInput) -> proc_macro2::TokenStream {    
+fn gen_impl(DeriveInput { ident, ..}: &DeriveInput) -> proc_macro2::TokenStream {
+    let shared_default_name = make_shared_default_name(ident);
     quote::quote!(
         #[automatically_derived]
         #[async_trait]
         impl Drop for #ident {
             fn drop(&mut self) {
                 // We consider a self that is completley equivalent to it's default version to be dropped
-                if Self::default() == *self {
+                let thing = #shared_default_name();
+                if *thing.lock().unwrap() == *self {
                     return;
                 }
 
@@ -158,7 +158,7 @@ fn gen_impl(DeriveInput { ident, ..}: &DeriveInput) -> proc_macro2::TokenStream 
                 });
 
                 // Perform synchronous wait
-                ::futures::executor::block_on(task).unwrap();
+                ::futures::executor::block_on(task);
             }
         }
     )

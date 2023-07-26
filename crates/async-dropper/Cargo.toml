@@ -57,3 +57,4 @@ async-dropper-simple.workspace = true
 
 [dev-dependencies]
 tokio = { workspace = true, features = [ "time", "macros", "rt", "rt-multi-thread" ]}
+async-std = { workspace = true, features = [ "attributes" ]}
