@@ -1,6 +1,9 @@
 <h1 align="center">🗑  <code>async-dropper</code></h1>
 
-`async-dropper` is probably the least-worst ad-hoc `AsyncDrop` implementation you've seen, as a trait called `AsyncDrop` and corresponding [derive macro][rust-derive-macro].
+`async-dropper` is probably the least-worst ad-hoc `AsyncDrop` implementation you've seen, and it works in two ways:
+
+- `async_dropper::simple` is stolen nearly verbatim from [this StackOverflow answer](https://stackoverflow.com/a/75584109) (thanks to [`paholg`](https://stackoverflow.com/users/2977291/paholg)!)
+- `async_dropper::derive` provides a trait called `AsyncDrop` and corresponding [derive macro][rust-derive-macro], which try to use `Default` and `PartialEq` to determine when to async drop.
 
 The code in this crate was most directly inspired by [this StackOverflow thread on Async Drop](https://stackoverflow.com/questions/71541765/rust-async-drop) and many other conversations:
 
@@ -35,6 +38,41 @@ async-dropper = "0.1"
 To use the "simple" version which uses a wrapper struct (`AsyncDropper<T>`), see [`examples/async_drop_simple.rs`](./examples/async_drop_simple.rs):
 
 ```rust
+use std::{
+    result::Result,
+    time::Duration,
+};
+
+use async_dropper_simple::{AsyncDrop, AsyncDropper};
+use async_trait::async_trait;
+
+// NOTE: this example is rooted in crates/async-dropper
+
+/// This object will be async-dropped (which must be wrapped in AsyncDropper)
+#[derive(Default)]
+struct AsyncThing(String);
+
+#[async_trait]
+impl AsyncDrop for AsyncThing {
+    async fn async_drop(&mut self) {
+        eprintln!("async dropping [{}]!", self.0);
+        tokio::time::sleep(Duration::from_secs(2)).await;
+        eprintln!("dropped [{}]!", self.0);
+    }
+}
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    {
+        let _example_obj = AsyncDropper::new(AsyncThing(String::from("test")));
+        eprintln!("here comes the (async) drop");
+        // drop will be triggered here, and it will take *however long it takes*
+        // you could also call `drop(_example_obj)`
+    }
+
+    Ok(())
+}
+
 ```
 
 You can run the example and see the output:
@@ -45,9 +83,60 @@ cargo run --example async-drop-simple --features=tokio
 
 ### `async_dropper::derive`
 
-To use the complex (and possibly *worse*) version which is a derive macro that tries to do everything for you, see [`examples/async_drop.rs`](./examples/async_drop.rs):
+The derive macro is an novel (and possibly foolhardy) attempt to implement `AsyncDrop` without actually wrapping the existing struct. 
+
+`async_dropper::derive` uses `Default` and `PartialEq` to *check if the struct in question is equivalent to it's default*.
+
+For this approach to work well your `T` should have cheap-to-create `Default`s, and comparing a default value to an existing value should meaningfully differ (and identify an object that is no longer in use). **Please think thoroughly about whether this model works for your use case**.
+
+For an example, see [`examples/async_drop.rs`](./examples/async_drop.rs):
 
 ```rust
+use std::{
+    result::Result,
+    time::Duration,
+};
+
+use async_dropper::derive::AsyncDrop;
+use async_trait::async_trait;
+
+/// This object will be async-dropped
+///
+/// Objects that are dropped *must* implement [Default] and [PartialEq]
+/// (so make members optional, hide them behind Rc/Arc as necessary)
+#[derive(Debug, Default, PartialEq, Eq, AsyncDrop)]
+struct AsyncThing(String);
+
+/// Implementation of [AsyncDrop] that specifies the actual behavior
+#[async_trait]
+impl AsyncDrop for AsyncThing {
+    async fn async_drop(&mut self) -> Result<(), AsyncDropError> {
+        // Wait 2 seconds then "succeed"
+        eprintln!("async dropping [{}]!", self.0);
+        tokio::time::sleep(Duration::from_secs(2)).await;
+        eprintln!("dropped [{}]!", self.0);
+        Ok(())
+    }
+
+    fn drop_timeout(&self) -> Duration {
+        Duration::from_secs(5) // extended from default 3 seconds
+    }
+
+    // NOTE: below was not implemented since we want the default of DropFailAction::Contineue
+    // fn drop_fail_action(&self) -> DropFailAction;
+}
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    {
+        let _example_obj = AsyncThing(String::from("test"));
+        eprintln!("here comes the (async) drop");
+        // drop will be triggered here
+        // you could also call `drop(_example_obj)`
+    }
+
+    Ok(())
+}
 ```
 
 You can run the example and see the output:

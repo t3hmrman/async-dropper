@@ -85,7 +85,6 @@ fn gen_impl(DeriveInput { ident, .. }: &DeriveInput) -> proc_macro2::TokenStream
                 // We consider a self that is completley equivalent to it's default version to be dropped
                 let thing = #shared_default_name();
                 if *thing.lock().unwrap() == *self {
-                    eprintln!("THIS IS A DEFAULT!");
                     return;
                 }
 

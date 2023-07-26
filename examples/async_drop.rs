@@ -1,3 +1,5 @@
+mod async_drop_simple;
+
 use std::{
     result::Result,
     time::Duration,
@@ -31,12 +33,12 @@ impl AsyncDrop for AsyncThing {
     }
 
     // NOTE: below was not implemented since we want the default of DropFailAction::Contineue
-    // fn drop_fail_action(&self) -> DropFailAction; 
+    // fn drop_fail_action(&self) -> DropFailAction;
 }
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    { 
+    {
         let _example_obj = AsyncThing(String::from("test"));
         eprintln!("here comes the (async) drop");
         // drop will be triggered here
@@ -44,5 +46,4 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     Ok(())
-    // Another drop happens after the function, but that one will be a no-op
 }
