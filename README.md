@@ -30,34 +30,24 @@ async-dropper = "0.1"
 
 ## Quickstart
 
-To see `async-dropper` in see [`examples/tokio.rs`](./examples/tokio.rs), the code is reproduced below:
+To see `async-dropper` in action, check out [`examples/tokio.rs`](./examples/tokio.rs), or read it below:
 
 ```rust
 use std::{
     result::Result,
-    sync::{Arc, Mutex},
     time::Duration,
 };
 
 use async_dropper::AsyncDrop;
 
-#[derive(Debug, Error)]
-enum ExampleError {
-    #[error("not done counting yet")]
-    NotDoneCountingError,
-
-    #[error("mutex encounted a poison error")]
-    MutexPoisonError,
-}
-
 /// This object will be async-dropped
 ///
-/// Objects that are dropped *must* implement Default and PartialEq
+/// Objects that are dropped *must* implement [Default] and [PartialEq]
 /// (so make members optional, hide them behind Rc/Arc as necessary)
 #[derive(Default, PartialEq, AsyncDrop)]
 struct ExampleObj(&str);
 
-/// Implementation of AsyncDrop that specifies the actual behavior
+/// Implementation of [AsyncDrop] that specifies the actual behavior
 #[async_trait]
 impl AsyncDrop for ExampleObject {
     async fn drop(&self) -> Result<(), AsyncDropFailure> {
@@ -89,7 +79,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 You can run the example and see the output:
 
 ```console
-cargo run --example tokio --features=tokio
+cargo run --example async-drop --features=tokio
 ```
 
 ## Supported environments
