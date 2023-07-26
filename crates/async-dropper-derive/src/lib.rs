@@ -5,6 +5,7 @@ pub fn derive_async_drop(item: proc_macro::TokenStream) -> proc_macro::TokenStre
 
 /// Default implementation of deriving async drop that does nothing
 /// you're expected to use either the 'tokio' feature or 'async-std'
+#[cfg(all(not(feature = "async-std"), not(feature = "tokio")))]
 fn _derive_async_drop(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
     item
 }
@@ -12,6 +13,7 @@ fn _derive_async_drop(item: proc_macro::TokenStream) -> proc_macro::TokenStream 
 /// Tokio implementation of AsyncDrop
 #[cfg(feature = "tokio")]
 fn _derive_async_drop(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    let item: proc_macro2::TokenStream = item.into();
     let ts = quote::quote!(
         #item
 
@@ -80,6 +82,8 @@ fn _derive_async_drop(item: proc_macro::TokenStream) -> proc_macro::TokenStream 
             }
         }
     );
+
+    ts.into()
 }
 
 /// async-std  implementation of AsyncDrop
