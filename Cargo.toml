@@ -1,0 +1,45 @@
+[package]
+name = "async-drop-derive"
+version = "0.1.0"
+repository = "https://github.com/t3hmrman/async-drop-derive"
+license = "MIT"
+readme = "README.md"
+edition = "2021"
+rust-version = "1.70"
+authors = [
+  "vados <vados@vadosware.io>"
+]
+categories = [
+  "asynchronous"
+]
+description = """
+The least-worst ad-hoc implementation of AsyncDrop as a Derive macro
+"""
+
+[[example]]
+name = "tokio"
+crate-type = [ "bin" ]
+required-features = [ "tokio" ]
+
+[[example]]
+name = "async-std"
+path = "./examples/async_std.rs"
+crate-type = [ "bin" ]
+required-features = [ "async-std" ]
+
+[features]
+defaults = ["tokio"]
+tokio = ["dep:tokio", "dep:async-trait"]
+async-std = ["dep:async-std", "dep:async-trait"]
+
+[dependencies]
+anyhow = "1.0.71"
+thiserror = "1.0.40"
+async-std = "1.12.0"
+tokio = { version = "1.29.1", optional = true }
+async-trait = { version = "0.1.69", optional = true }
+
+[dev-dependencies]
+async-std = { version = "1.12.0", features = [ "attributes" ] }
+tokio = { version = "1.29.1", features = [ "time", "rt", "macros", "rt-multi-thread" ] }
+thiserror = "1.0.40"
