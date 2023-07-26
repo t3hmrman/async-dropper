@@ -22,6 +22,24 @@ path = "../../examples/async_drop.rs"
 crate-type = [ "bin" ]
 required-features = [ "tokio" ]
 
+[[example]]
+name = "async-drop-async-std"
+path = "../../examples/async_drop_async_std.rs"
+crate-type = [ "bin" ]
+required-features = [ "async-std" ]
+
+[[example]]
+name = "async-drop-simple"
+path = "../../examples/async_drop_simple.rs"
+crate-type = [ "bin" ]
+required-features = [ "tokio" ]
+
+[[example]]
+name = "async-drop-simple-async-std"
+path = "../../examples/async_drop_simple_async_std.rs"
+crate-type = [ "bin" ]
+required-features = [ "async-std" ]
+
 [features]
 defaults = ["tokio"]
 tokio = ["dep:tokio"]

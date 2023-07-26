@@ -106,8 +106,8 @@ test-int:
     @{{cargo}} nextest run -E 'kind(test)'
 
 test-examples:
-    @{{cargo}} run --example tokio
-    @{{cargo}} run --example async-std --features=async-std
+    @{{cargo}} run --example async-drop-simple --features=tokio
+    @{{cargo}} run --example async-drop-async-std --features=async-std
 
 ######################
 # Release Management #

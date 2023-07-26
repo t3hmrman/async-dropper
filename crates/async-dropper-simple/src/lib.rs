@@ -8,6 +8,7 @@ pub trait AsyncDrop {
 }
 
 #[derive(Default)]
+#[allow(dead_code)]
 pub struct AsyncDropper<T: AsyncDrop + Default + Send + 'static> {
     dropped: bool,
     timeout: Option<Duration>,

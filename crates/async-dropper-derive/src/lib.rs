@@ -69,7 +69,7 @@ fn gen_preamble(DeriveInput { ident, .. }: &DeriveInput) -> proc_macro2::TokenSt
 }
 
 #[cfg(all(not(feature = "async-std"), not(feature = "tokio")))]
-fn gen_impl(_: DeriveInput) -> proc_macro::TokenStream {
+fn gen_impl(_: &DeriveInput) -> proc_macro::TokenStream {
     panic!("either 'async-std' or 'tokio' features must be enabled for the async-dropper crate")
 }
 
@@ -123,7 +123,7 @@ fn gen_impl(DeriveInput { ident, .. }: &DeriveInput) -> proc_macro2::TokenStream
 
 /// async-std  implementation of AsyncDrop
 #[cfg(feature = "async-std")]
-fn gen_impl(DeriveInput { ident, ..}: DeriveInput) -> proc_macro2::TokenStream {    
+fn gen_impl(DeriveInput { ident, ..}: &DeriveInput) -> proc_macro2::TokenStream {    
     quote::quote!(
         #[automatically_derived]
         #[async_trait]
