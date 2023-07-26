@@ -1,5 +1,5 @@
 [package]
-name = "async-dropper"
+name = "async-dropper-simple"
 version = "0.1.0"
 repository = "https://github.com/t3hmrman/async-dropper"
 license = "MIT"
@@ -13,12 +13,12 @@ categories = [
   "asynchronous",
 ]
 description = """
-The least-worst ad-hoc implementation of AsyncDrop as a Derive macro
+A simple struct-wrapper (i.e. AsyncDropper<T>) based implementation of AsyncDrop
 """
 
 [[example]]
-name = "async-drop"
-path = "../../examples/async_drop.rs"
+name = "async-drop-simple"
+path = "../../examples/async_drop_simple.rs"
 crate-type = [ "bin" ]
 required-features = [ "tokio" ]
 
@@ -35,7 +35,6 @@ tokio = { workspace = true, optional = true }
 futures.workspace = true
 async-trait.workspace = true
 async-dropper-derive.workspace = true
-async-dropper-simple.workspace = true
 
 [dev-dependencies]
 tokio = { workspace = true, features = [ "time", "macros", "rt", "rt-multi-thread" ]}

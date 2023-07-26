@@ -25,10 +25,8 @@ tokio = ["dep:tokio" ]
 async-std = ["dep:async-std" ]
 
 [dependencies]
-anyhow.workspace = true
-thiserror.workspace = true
-async-std = { workspace = true, optional = true }
-tokio = { workspace = true, optional = true }
-async-trait.workspace = true
 proc-macro2.workspace = true
 quote.workspace = true
+syn.workspace = true
+async-std = { workspace = true, optional = true }
+tokio = { workspace = true, optional = true }

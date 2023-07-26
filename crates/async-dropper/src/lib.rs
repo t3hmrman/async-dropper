@@ -1,4 +1,7 @@
 // re-exports for the macro crate to use
 pub use anyhow;
 pub use thiserror;
-pub use async_dropper_derive as async_dropper;
+#[cfg(feature = "tokio")]
+pub use tokio;
+pub use async_dropper_derive as derive;
+pub use async_dropper_simple as simple;
