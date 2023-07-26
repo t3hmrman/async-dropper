@@ -30,10 +30,24 @@ async-dropper = "0.1"
 
 ## Quickstart
 
-To see `async-dropper` in action, check out [`examples/tokio.rs`](./examples/tokio.rs), or read it below:
+### `async_dropper::simple`
+
+To use the "simple" version which uses a wrapper struct (`AsyncDropper<T>`), see [`examples/async_drop_simple.rs`](./examples/async_drop_simple.rs):
 
 ```rust
-TODO
+```
+
+You can run the example and see the output:
+
+```console
+cargo run --example async-drop-simple --features=tokio
+```
+
+### `async_dropper::derive`
+
+To use the complex (and possibly *worse*) version which is a derive macro that tries to do everything for you, see [`examples/async_drop.rs`](./examples/async_drop.rs):
+
+```rust
 ```
 
 You can run the example and see the output:
