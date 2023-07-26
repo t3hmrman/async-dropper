@@ -16,6 +16,9 @@ description = """
 The derive macro crate that supplies the implementation for AsyncDrop
 """
 
+[lib]
+proc-macro = true
+
 [features]
 defaults = ["tokio"]
 tokio = ["dep:tokio" ]

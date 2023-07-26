@@ -1,14 +1,18 @@
-use quote::quote;
-
 #[proc_macro_derive(AsyncDrop)]
 pub fn derive_async_drop(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
     _derive_async_drop(item)
 }
 
+/// Default implementation of deriving async drop that does nothing
+/// you're expected to use either the 'tokio' feature or 'async-std'
+fn _derive_async_drop(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    item
+}
+
 /// Tokio implementation of AsyncDrop
 #[cfg(feature = "tokio")]
 fn _derive_async_drop(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    let ts = quote!(
+    let ts = quote::quote!(
         #item
 
         #[derive(Debug, async_dropper::thiserror)]

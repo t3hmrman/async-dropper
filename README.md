@@ -22,35 +22,74 @@ async-drop-derive = "0.1"
 > **Warning**
 > `async-drop-derive` does not allow using both `async-std` and `tokio` features at the same time (see [the FAQ below](#FAQ)).
 
+
 ## Quickstart
 
-### [`tokio`][tokio]
+To see `async-dropper` in see [`examples/tokio.rs`](./examples/tokio.rs), the code is reproduced below:
 
 ```rust
-TODO
+use std::{
+    result::Result,
+    sync::{Arc, Mutex},
+    time::Duration,
+};
+
+use async_dropper::AsyncDrop;
+
+#[derive(Debug, Error)]
+enum ExampleError {
+    #[error("not done counting yet")]
+    NotDoneCountingError,
+
+    #[error("mutex encounted a poison error")]
+    MutexPoisonError,
+}
+
+/// This object will be async-dropped
+///
+/// Objects that are dropped *must* implement Default and PartialEq
+/// (so make members optional, hide them behind Rc/Arc as necessary)
+#[derive(Default, PartialEq, AsyncDrop)]
+struct ExampleObj(&str);
+
+/// Implementation of AsyncDrop that specifies the actual behavior
+#[async_trait]
+impl AsyncDrop for ExampleObject {
+    async fn drop(&self) -> Result<(), AsyncDropFailure> {
+        // Wait 2 seconds then "succeed"
+        tokio::sleep(Duration::from_secs(2)).await;
+        eprintln!("dropping [{}]!", self.0);
+        Ok(())
+    }
+
+    fn drop_timeout() -> Duration {
+        Duration::from_secs(5) // extended from default 3 seconds
+    }
+
+    // NOTE: below was not implemented since we want the default of DropFailAction::Contineue
+    // fn drop_fail_action() -> DropFailAction; 
+}
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let example_obj = ExampleObj("test");
+    eprintln!("here comes the (async) drop");
+    drop(example_obj);
+
+    Ok(())
+    // Another drop happens after the function, but that one will be a no-op
+}
 ```
 
-To run the example in [`examples/tokio.rs`](./examples/tokio.rs):
-
-```
-cargo run --example tokio --features=tokio
-```
-
-### [`async-std`][async-std]
-
-```rust
-TODO
-```
-
-To run the example in [`examples/async-std/main.rs`](./examples/async-std/main.rs):
+You can run the example and see the output:
 
 ```console
-cargo run --example async-std --features=async-std
+cargo run --example tokio --features=tokio
 ```
 
 ## Supported environments
 
-`async-drop-derive` works with the following environments:
+`async-drop-derive` works with the following async environments:
 
 | Name                              | Supported? |
 |-----------------------------------|------------|
@@ -64,7 +103,7 @@ cargo run --example async-std --features=async-std
 
 ### Why does `async-drop-derive` assume that I'm using *either* `async-std` or `tokio`
 
-Because you probably are. If this is a problem for you, it *can* be changed, file an issue and let's chat about it.
+Because you probably are. If this is a problem for you, it *can* be changed, please file an issue.
 
 ## Development
 
