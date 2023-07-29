@@ -8,7 +8,7 @@ just := env_var_or_default("JUST", just_executable())
 root_dir := invocation_directory()
 
 version := `cargo get version | head --bytes=-1`
-name := `cargo get name | head --bytes=-1`
+name := `cargo get -n | head --bytes=-1`
 sha := `git rev-parse --short HEAD`
 
 ######################
