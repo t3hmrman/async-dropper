@@ -188,6 +188,20 @@ There are a few useful targets like `just build-watch` which will continuously b
 [just]: https://github.com/casey/just
 [cargo-watch]: https://crates.io/crates/cargo-watch
 
+## Releasing
+
+From the top level of this repository:
+
+```console
+PUBLISH_CRATE=yes PKG=<crate name> just release <version>
+```
+
+For example, to create the next semver `patch` release for `async-dropper-simple`:
+
+```console
+PUBLISH_CRATE=yes PKG=async-dropper-simple just release patch
+```
+
 ## Contributing
 
 Contributions are welcome! If you find a bug or an impovement that should be included in `async-dropper`, [create an issue](https://github.com/t3hmrman/async-dropper/issues) or open a pull request.
