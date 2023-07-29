@@ -22,41 +22,27 @@ changelog_file_path := env_var_or_default("CHANGELOG_FILE_PATH", "CHANGELOG")
 changelog:
   {{git}} cliff --unreleased --tag={{version}} --prepend={{changelog_file_path}}
 
-# Release a major version
+# Generic release automation
+release version:
+    {{git}} fetch --tags
+    {{cargo}} set-version --bump {{version}} --package {{name}}
+    {{just}} changelog
+    {{git}} commit -am "release: {{name}} v`just print-version`"
+    {{git}} push
+    {{git}} tag {{name}}-v`just print-version`
+    {{git}} push {{name}}-v`just print-version`
+    if [ "{{publish_crate}}" = "yes" ]; then \
+      {{cargo}} publish; \
+    fi
+
+# Release the next major version
 release-major:
-    {{git}} fetch --tags
-    {{cargo}} set-version --bump major
-    {{just}} changelog
-    {{git}} commit -am "release: {{name}} v`just print-version`"
-    {{git}} push
-    {{git}} tag {{name}}-v`just print-version`
-    {{git}} push {{name}}-v`just print-version`
-    if [ "{{publish_crate}}" = "yes" ]; then \
-      {{cargo}} publish; \
-    fi
+    {{just}} release major
 
-# Release a minor version
+# Release the next minor version
 release-minor:
-    {{git}} fetch --tags
-    {{cargo}} set-version --bump minor
-    {{just}} changelog
-    {{git}} commit -am "release: {{name}} v`just print-version`"
-    {{git}} push
-    {{git}} tag {{name}}-v`just print-version`
-    {{git}} push {{name}}-v`just print-version`
-    if [ "{{publish_crate}}" = "yes" ]; then \
-      {{cargo}} publish; \
-    fi
+    {{just}} release minor
 
-# Release a patch version
+# Release the next patch version
 release-patch:
-    {{git}} fetch --tags
-    {{cargo}} set-version --bump patch
-    {{just}} changelog
-    {{git}} commit -am "release: {{name}} v`just print-version`"
-    {{git}} push
-    {{git}} tag {{name}}-v`just print-version`
-    {{git}} push {{name}}-v`just print-version`
-    if [ "{{publish_crate}}" = "yes" ]; then \
-      {{cargo}} publish; \
-    fi
+    {{just}} release patch
