@@ -1,7 +1,8 @@
 [workspace]
 members = [
+  "crates/async-dropper",
   "crates/async-dropper-derive",
-  "crates/async-dropper"
+  "crates/async-dropper-simple",
 ]
 
 [workspace.dependencies]
