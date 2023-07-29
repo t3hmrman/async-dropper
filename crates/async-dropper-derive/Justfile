@@ -11,6 +11,27 @@ version := `cargo get version | head --bytes=-1`
 name := `cargo get -n | head --bytes=-1`
 sha := `git rev-parse --short HEAD`
 
+#############
+# Utilities #
+#############
+
+# Print the current version
+print-version:
+    @echo -n "{{version}}"
+
+# Print the current SHA
+print-sha:
+    @echo -n "{{sha}}"
+
+# Ensure a binary is present
+ensure-binary bin env_name:
+    #!/usr/bin/env -S bash -euo pipefail
+    if [ -z "$(command -v {{bin}})" ]; then
+      echo "Missing binary [{{bin}}], make sure it is installed & on your PATH (or override it's location with {{env_name}})";
+      echo "(if the binary is not on your system, you may need to install the package via cargo)";
+      exit 1;
+    fi
+
 ######################
 # Release Management #
 ######################
