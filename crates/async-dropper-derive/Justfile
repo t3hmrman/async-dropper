@@ -34,15 +34,3 @@ release version:
     if [ "{{publish_crate}}" = "yes" ]; then \
       {{cargo}} publish; \
     fi
-
-# Release the next major version
-release-major:
-    {{just}} release major
-
-# Release the next minor version
-release-minor:
-    {{just}} release minor
-
-# Release the next patch version
-release-patch:
-    {{just}} release patch

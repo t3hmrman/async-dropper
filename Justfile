@@ -6,6 +6,7 @@ cargo_watch := env_var_or_default("CARGO_WATCH", "cargo-watch")
 just := env_var_or_default("JUST", just_executable())
 
 root_dir := invocation_directory()
+package := env_var_or_default("PKG", "unset")
 
 version := `cargo get version | head --bytes=-1`
 sha := `git rev-parse --short HEAD`
@@ -108,3 +109,22 @@ test-int:
 test-examples:
     @{{cargo}} run --example async-drop-simple --features=tokio
     @{{cargo}} run --example async-drop-async-std --features=async-std
+
+######################
+# Release Management #
+######################
+
+publish_crate := env_var_or_default("PUBLISH_CRATE", "no")
+changelog_file_path := env_var_or_default("CHANGELOG_FILE_PATH", "CHANGELOG")
+
+# Generate the changelog
+changelog:
+  {{git}} cliff --unreleased --tag={{version}} --prepend={{changelog_file_path}}
+
+# Generic release automation
+release version:
+    @if [ "{{package}}" == "unset" ]; then \
+      echo "[error] Cannot release all packages at once, ENV var PKG must be set"; \
+      exit 1; \
+    fi
+    cd ./crates/{{package}} && {{just}} release {{version}}
