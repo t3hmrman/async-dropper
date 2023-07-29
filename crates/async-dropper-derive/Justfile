@@ -52,7 +52,7 @@ release version:
     {{git}} commit -am "release: {{name}} v`just print-version`"
     {{git}} push
     {{git}} tag {{name}}-v`just print-version`
-    {{git}} push {{name}}-v`just print-version`
+    {{git}} push origin {{name}}-v`just print-version`
     if [ "{{publish_crate}}" = "yes" ]; then \
       {{cargo}} publish -p {{name}}; \
     fi
