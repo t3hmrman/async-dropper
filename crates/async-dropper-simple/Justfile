@@ -11,18 +11,38 @@ version := `cargo get version | head --bytes=-1`
 name := `cargo get -n | head --bytes=-1`
 sha := `git rev-parse --short HEAD`
 
+#############
+# Utilities #
+#############
+
+# Print the current version
+print-version:
+    @echo -n "{{version}}"
+
+# Print the current SHA
+print-sha:
+    @echo -n "{{sha}}"
+
+# Ensure a binary is present
+ensure-binary bin env_name:
+    #!/usr/bin/env -S bash -euo pipefail
+    if [ -z "$(command -v {{bin}})" ]; then
+      echo "Missing binary [{{bin}}], make sure it is installed & on your PATH (or override it's location with {{env_name}})";
+      echo "(if the binary is not on your system, you may need to install the package via cargo)";
+      exit 1;
+    fi
+
 ######################
 # Release Management #
 ######################
 
 publish_crate := env_var_or_default("PUBLISH_CRATE", "no")
 changelog_file_path := env_var_or_default("CHANGELOG_FILE_PATH", "CHANGELOG")
-cliff_toml_cfg_path := absolute_path("../../cliff.toml")
 repo_path := absolute_path("../../")
 
 # Generate the changelog
 changelog:
-  {{git}} cliff -r {{repo_path}} -c {{cliff_toml_cfg_path}} --unreleased --tag={{version}} --prepend={{changelog_file_path}}
+  {{git}} cliff -r {{repo_path}} -c cliff.toml --unreleased --tag={{version}} --prepend={{changelog_file_path}}
 
 # Generic release automation
 release version:
