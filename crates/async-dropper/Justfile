@@ -1,0 +1,62 @@
+git := env_var_or_default("GIT", "git")
+rustc := env_var_or_default("RUSTC", "rustc")
+cargo := env_var_or_default("CARGO", "cargo")
+cargo_watch := env_var_or_default("CARGO_WATCH", "cargo-watch")
+
+just := env_var_or_default("JUST", just_executable())
+
+root_dir := invocation_directory()
+
+version := `cargo get version | head --bytes=-1`
+name := `cargo get name | head --bytes=-1`
+sha := `git rev-parse --short HEAD`
+
+######################
+# Release Management #
+######################
+
+publish_crate := env_var_or_default("PUBLISH_CRATE", "no")
+changelog_file_path := env_var_or_default("CHANGELOG_FILE_PATH", "CHANGELOG")
+
+# Generate the changelog
+changelog:
+  {{git}} cliff --unreleased --tag={{version}} --prepend={{changelog_file_path}}
+
+# Release a major version
+release-major:
+    {{git}} fetch --tags
+    {{cargo}} set-version --bump major
+    {{just}} changelog
+    {{git}} commit -am "release: {{name}} v`just print-version`"
+    {{git}} push
+    {{git}} tag {{name}}-v`just print-version`
+    {{git}} push {{name}}-v`just print-version`
+    if [ "{{publish_crate}}" = "yes" ]; then \
+      {{cargo}} publish; \
+    fi
+
+# Release a minor version
+release-minor:
+    {{git}} fetch --tags
+    {{cargo}} set-version --bump minor
+    {{just}} changelog
+    {{git}} commit -am "release: {{name}} v`just print-version`"
+    {{git}} push
+    {{git}} tag {{name}}-v`just print-version`
+    {{git}} push {{name}}-v`just print-version`
+    if [ "{{publish_crate}}" = "yes" ]; then \
+      {{cargo}} publish; \
+    fi
+
+# Release a patch version
+release-patch:
+    {{git}} fetch --tags
+    {{cargo}} set-version --bump patch
+    {{just}} changelog
+    {{git}} commit -am "release: {{name}} v`just print-version`"
+    {{git}} push
+    {{git}} tag {{name}}-v`just print-version`
+    {{git}} push {{name}}-v`just print-version`
+    if [ "{{publish_crate}}" = "yes" ]; then \
+      {{cargo}} publish; \
+    fi

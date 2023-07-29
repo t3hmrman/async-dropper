@@ -108,37 +108,3 @@ test-int:
 test-examples:
     @{{cargo}} run --example async-drop-simple --features=tokio
     @{{cargo}} run --example async-drop-async-std --features=async-std
-
-######################
-# Release Management #
-######################
-
-changelog_file_path := env_var_or_default("CHANGELOG_FILE_PATH", "CHANGELOG")
-
-# Generate the changelog
-changelog:
-  {{git}} cliff --unreleased --tag={{version}} --prepend={{changelog_file_path}}
-
-# Release a major version
-release-major:
-    {{git}} fetch --tags
-    {{cargo}} set-version --bump major
-    {{just}} changelog
-    {{git}} commit -am "release: v`just print-version`"
-    {{git}} push
-
-# Release a minor version
-release-minor:
-    {{git}} fetch --tags
-    {{cargo}} set-version --bump minor
-    {{just}} changelog
-    {{git}} commit -am "release: v`just print-version`"
-    {{git}} push
-
-# Release a patch version
-release-patch:
-    {{git}} fetch --tags
-    {{cargo}} set-version --bump patch
-    {{just}} changelog
-    {{git}} commit -am "release: v`just print-version`"
-    {{git}} push
