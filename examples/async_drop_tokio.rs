@@ -41,12 +41,6 @@ impl AsyncDrop for AsyncThing {
 #[tokio::main]
 #[allow(dead_code)]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    {
-        let _example_obj = AsyncThing(String::from("test"));
-        eprintln!("here comes the (async) drop");
-        // drop will be triggered here
-        // you could also call `drop(_example_obj)`
-    }
-
+    drop(AsyncThing(String::from("test")));
     Ok(())
 }

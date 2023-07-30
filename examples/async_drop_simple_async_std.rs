@@ -23,12 +23,6 @@ impl AsyncDrop for AsyncThing {
 
 #[async_std::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    {
-        let _example_obj = AsyncDropper::new(AsyncThing(String::from("test")));
-        eprintln!("here comes the (async) drop");
-        // drop will be triggered here, and it will take *however long it takes*
-        // you could also call `drop(_example_obj)`
-    }
-
+    drop(AsyncDropper::new(AsyncThing(String::from("test"))));
     Ok(())
 }

@@ -128,6 +128,9 @@ fn gen_impl(DeriveInput { ident, .. }: &DeriveInput) -> proc_macro2::TokenStream
 
                 // After the async wait, we must reset all fields to the default (so future checks will fail)
                 original.reset();
+                if *thing.lock().unwrap() != original {
+                    panic!("after calling AsyncDrop::reset(), the object does *not* equal T::default()");
+                }
             }
         }
     )
@@ -177,6 +180,9 @@ fn gen_impl(DeriveInput { ident, ..}: &DeriveInput) -> proc_macro2::TokenStream 
 
                 // Reset the task to ensure it won't trigger async drop behavior again
                 original.reset();
+                if *thing.lock().unwrap() != original {
+                    panic!("after calling AsyncDrop::reset(), the object does *not* equal T::default()");
+                }
             }
         }
     )
