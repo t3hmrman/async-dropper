@@ -101,8 +101,7 @@ fn gen_impl(DeriveInput { ident, .. }: &DeriveInput) -> proc_macro2::TokenStream
                 }
 
                 // Ensure that the default_version is manually dropped
-                let mut original = Self::default();
-                std::mem::swap(&mut original, self);
+                let mut original = std::mem::take(self);
 
                 // Spawn a task to do the drop
                 let task = ::tokio::spawn(async move {
@@ -153,8 +152,7 @@ fn gen_impl(DeriveInput { ident, ..}: &DeriveInput) -> proc_macro2::TokenStream 
                 }
 
                 // Swap out the existing with a completely default
-                let mut original = Self::default();
-                std::mem::swap(&mut original, self);
+                let mut original = std::mem::take(self);
 
                 // Spawn a task to do the drop
                 let task = ::async_std::task::spawn(async move {
