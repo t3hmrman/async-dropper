@@ -63,7 +63,7 @@ commit_parsers = [
 filter_commits = true
 
 # glob pattern for matching git tags
-tag_pattern = "v[0-9]*"
+tag_pattern = "async-dropper-v[0-9]*"
 
 # regex for skipping tags
 skip_tags = ".*beta.*"
