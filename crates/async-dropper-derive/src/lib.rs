@@ -124,7 +124,7 @@ fn gen_impl(DeriveInput { ident, .. }: &DeriveInput) -> proc_macro2::TokenStream
                 });
 
                 // Perform a synchronous wait
-                let mut original = tokio::task::block_in_place(|| tokio::runtime::Handle::current().block_on(task).unwrap());
+                let mut original = ::tokio::task::block_in_place(|| ::tokio::runtime::Handle::current().block_on(task).unwrap());
 
                 // After the async wait, we must reset all fields to the default (so future checks will fail)
                 original.reset();
