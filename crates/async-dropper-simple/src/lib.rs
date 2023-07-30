@@ -40,7 +40,10 @@ impl<T: AsyncDrop + Default + Send + 'static> Drop for AsyncDropper<T> {
     }
 }
 
-#[cfg(feature = "tokio")]
+#[cfg(all(feature = "async-std", feature = "tokio"))]
+impl<T: AsyncDrop + Default + Send + 'static> Drop for AsyncDropper<T> {}
+
+#[cfg(all(feature = "tokio", not(feature = "async-std")))]
 impl<T: AsyncDrop + Default + Send + 'static> Drop for AsyncDropper<T> {
     fn drop(&mut self) {
         if !self.dropped {
@@ -54,19 +57,19 @@ impl<T: AsyncDrop + Default + Send + 'static> Drop for AsyncDropper<T> {
                 this.inner.async_drop().await;
             });
 
-            match timeout {
+            tokio::task::block_in_place(|| match timeout {
                 Some(d) => {
                     let _ = futures::executor::block_on(tokio::time::timeout(d, task));
-                },
+                }
                 None => {
                     let _ = futures::executor::block_on(task);
-                },
-            };
+                }
+            });
         }
     }
 }
 
-#[cfg(feature = "async-std")]
+#[cfg(all(feature = "async-std", not(feature = "tokio")))]
 impl<T: AsyncDrop + Default + Send + 'static> Drop for AsyncDropper<T> {
     fn drop(&mut self) {
         if !self.dropped {
@@ -83,12 +86,11 @@ impl<T: AsyncDrop + Default + Send + 'static> Drop for AsyncDropper<T> {
             match timeout {
                 Some(d) => {
                     let _ = futures::executor::block_on(async_std::future::timeout(d, task));
-                },
+                }
                 None => {
                     let _ = futures::executor::block_on(task);
-                },
+                }
             };
-
         }
     }
 }
