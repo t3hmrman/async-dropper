@@ -54,8 +54,7 @@ impl<T: AsyncDrop + Default + Send + 'static> Drop for AsyncDropper<T> {
 impl<T: AsyncDrop + Default + Send + 'static> Drop for AsyncDropper<T> {
     fn drop(&mut self) {
         if !self.dropped {
-            let mut this = AsyncDropper::default();
-            std::mem::swap(&mut this, self);
+            let mut this = std::mem::take(self);
             this.dropped = true;
 
             // Create task
@@ -81,8 +80,7 @@ impl<T: AsyncDrop + Default + Send + 'static> Drop for AsyncDropper<T> {
 impl<T: AsyncDrop + Default + Send + 'static> Drop for AsyncDropper<T> {
     fn drop(&mut self) {
         if !self.dropped {
-            let mut this = AsyncDropper::default();
-            std::mem::swap(&mut this, self);
+            let mut this = std::mem::take(self);
             this.dropped = true;
 
             // Create task
