@@ -46,8 +46,6 @@ tokio = ["dep:tokio", "async-dropper-derive/tokio"]
 async-std = ["dep:async-std", "async-dropper-derive/async-std"]
 
 [dependencies]
-anyhow.workspace = true
-thiserror.workspace = true
 async-std = { workspace = true, optional = true }
 tokio = { workspace = true, optional = true, features = [ "rt", "rt-multi-thread" ] }
 futures.workspace = true

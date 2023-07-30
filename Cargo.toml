@@ -6,8 +6,6 @@ members = [
 ]
 
 [workspace.dependencies]
-anyhow = "1.0.71"
-thiserror = "1.0.40"
 async-std = "1.12.0"
 tokio = "1.29.1"
 async-trait = "0.1.69"
