@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [0.1.4] - 2023-07-30
+
+### Refactor
+
+- Use std::mem::take
+
 ## [0.1.2] - 2023-07-30
 
 ### Bug Fixes
