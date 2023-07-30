@@ -1,5 +1,3 @@
-mod async_drop_simple;
-
 use std::{
     result::Result,
     time::Duration,
@@ -28,6 +26,10 @@ impl AsyncDrop for AsyncThing {
         Ok(())
     }
 
+    fn reset(&mut self) {
+        self.0 = String::default();
+    }
+
     fn drop_timeout(&self) -> Duration {
         Duration::from_secs(5) // extended from default 3 seconds
     }
@@ -37,6 +39,7 @@ impl AsyncDrop for AsyncThing {
 }
 
 #[async_std::main]
+#[allow(dead_code)]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     {
         let _example_obj = AsyncThing(String::from("test"));

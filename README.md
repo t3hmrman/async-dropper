@@ -15,16 +15,18 @@ The code in this crate was most directly inspired by [this StackOverflow thread 
 
 ## Install
 
+You **must** set features on this crate, as it works with async runtimes:
+
 ```console
-cargo add async-dropper                      # by default, tokio is enabled
+cargo add async-dropper --features tokio     # use tokio
 cargo add async-dropper --features async-std # use async-std
 ```
 
-If you're editing `Cargo.toml` by hand:
+If you're editing `Cargo.toml` by hand, **choose one** of the following lines:
 
 ```toml
 [dependencies]
-async-dropper = "0.1"
+#async-dropper = { version = "0.1", features = [ "tokio" ] }
 #async-dropper = { version = "0.1", features = [ "async-std" ] }
 ```
 
@@ -83,7 +85,7 @@ cargo run --example async-drop-simple --features=tokio
 
 ### `async_dropper::derive`
 
-The derive macro is an novel (and possibly foolhardy) attempt to implement `AsyncDrop` without actually wrapping the existing struct. 
+The derive macro is a novel (and possibly foolhardy) attempt to implement `AsyncDrop` without actually wrapping the existing struct.
 
 `async_dropper::derive` uses `Default` and `PartialEq` to *check if the struct in question is equivalent to it's default*.
 
@@ -110,19 +112,26 @@ struct AsyncThing(String);
 /// Implementation of [AsyncDrop] that specifies the actual behavior
 #[async_trait]
 impl AsyncDrop for AsyncThing {
+    // simulated work during async_drop
     async fn async_drop(&mut self) -> Result<(), AsyncDropError> {
-        // Wait 2 seconds then "succeed"
         eprintln!("async dropping [{}]!", self.0);
         tokio::time::sleep(Duration::from_secs(2)).await;
         eprintln!("dropped [{}]!", self.0);
         Ok(())
     }
 
+    // This function serves to indicate when async_drop behavior should *not* be performed
+    // (i.e., if Self::default == Self, a drop must have occurred, or does not need to)
+    fn reset(&mut self) {
+        self.0 = String::default();
+    }
+
+    // How long we can allow async drop behavior to block
     fn drop_timeout(&self) -> Duration {
         Duration::from_secs(5) // extended from default 3 seconds
     }
 
-    // NOTE: below was not implemented since we want the default of DropFailAction::Contineue
+    // NOTE: below was not implemented since we want the default of DropFailAction::Continue
     // fn drop_fail_action(&self) -> DropFailAction;
 }
 
@@ -162,6 +171,15 @@ cargo run --example async-drop --features=tokio
 ### Why does `async-dropper` assume that I'm using *either* `async-std` or `tokio`
 
 Because you probably are. If this is a problem for you, it *can* be changed, please file an issue.
+
+### What does `async_dropper::derive` cost?
+
+There is waste introduced by `async_dropper::derive`, namely:
+
+- One `Mutex`-protected `T::default()` instance of your type, that exists as long as the program runs
+- One extra `T::default()` that is made of an individual `T` being dropped.
+
+As a result, every `drop` you perform on a T will perform two drops -- one on a `T::default()` and another on *your* `T`, which has been *converted* to a `T::default` (via `reset(&mut self)`).
 
 ## Development
 
