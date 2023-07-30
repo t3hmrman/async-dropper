@@ -1,6 +1,17 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [0.1.2] - 2023-07-30
+
+### Bug Fixes
+
+- Remove unused tokio re-export
+- Missing external import in macro
+
+### Documentation
+
+- Support feature specification for docsrs
+
 ## [0.1.1] - 2023-07-30
 
 ### Bug Fixes
