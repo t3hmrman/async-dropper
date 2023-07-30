@@ -28,7 +28,6 @@ async-std = { workspace = true, optional = true }
 tokio = { workspace = true, optional = true }
 futures.workspace = true
 async-trait.workspace = true
-async-dropper-derive.workspace = true
 
 [dev-dependencies]
 tokio = { workspace = true, features = [ "time", "macros", "rt", "rt-multi-thread" ]}
