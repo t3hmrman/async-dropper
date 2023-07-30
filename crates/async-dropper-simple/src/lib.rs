@@ -1,5 +1,7 @@
+#![cfg_attr(all(doc, CHANNEL_NIGHTLY), feature(doc_cfg))]
 ///! The code in this file was shamelessly stolen from
 ///! https://stackoverflow.com/questions/71541765/rust-async-drop
+
 use std::time::Duration;
 
 #[async_trait::async_trait]
@@ -41,9 +43,14 @@ impl<T: AsyncDrop + Default + Send + 'static> Drop for AsyncDropper<T> {
 }
 
 #[cfg(all(feature = "async-std", feature = "tokio"))]
-impl<T: AsyncDrop + Default + Send + 'static> Drop for AsyncDropper<T> {}
+impl<T: AsyncDrop + Default + Send + 'static> Drop for AsyncDropper<T> {
+    fn drop(&mut self) {
+        panic!("'async-std' and 'tokio' features cannot both be specified for the async-dropper crate")
+    }
+}
 
 #[cfg(all(feature = "tokio", not(feature = "async-std")))]
+#[cfg_attr(docsrs, doc(cfg(feature = "tokio")))]
 impl<T: AsyncDrop + Default + Send + 'static> Drop for AsyncDropper<T> {
     fn drop(&mut self) {
         if !self.dropped {
@@ -70,6 +77,7 @@ impl<T: AsyncDrop + Default + Send + 'static> Drop for AsyncDropper<T> {
 }
 
 #[cfg(all(feature = "async-std", not(feature = "tokio")))]
+#[cfg_attr(docsrs, doc(cfg(feature = "async-std")))]
 impl<T: AsyncDrop + Default + Send + 'static> Drop for AsyncDropper<T> {
     fn drop(&mut self) {
         if !self.dropped {
