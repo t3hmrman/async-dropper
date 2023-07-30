@@ -1,6 +1,18 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [0.1.2] - 2023-07-30
+
+### Bug Fixes
+
+- Add simple to workspace
+- Remove requirement on async-dropper-derive
+- Remove unused dependencies on anyhow & thiserror
+
+### Refactor
+
+- Stricter cfg usage
+
 ## [0.1.1] - 2023-07-30
 
 ### Bug Fixes
