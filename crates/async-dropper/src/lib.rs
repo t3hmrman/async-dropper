@@ -1,13 +1,9 @@
-//! Async Dropper
+//! `async_dropper` provides two ad-hoc implementations of asynchronous `drop` behavior (`AsyncDrop`).
 //!
-//! <hr>
+//! - `async_dropper::simple` uses a wrapper struct (suggested on [StackOverflow by paholg](https://stackoverflow.com/a/75584109))
+//! - `async_dropper::derive` introduces a `derive` macro (`AsyncDrop`) which generates code that enables async drop functionality to run during a regular `drop`. That code requires `T: Default + PartialEq + Eq`.
 //!
-//! This library provides two ad-hoc implementations of asynchronous `drop` behavior (`AsyncDrop`).
-//!
-//! - `async_drop::simple` uses a wrapper struct (suggested on [StackOverflow by paholg](https://stackoverflow.com/a/75584109))
-//! - `async_drop::derive` introduces a `derive` macro (`AsyncDrop`) which generates code that enables async drop functionality to run during a regular `drop`. That code requires `T: Default + PartialEq + Eq`.
-//!
-//! Here is a quick example of the shorter `async_drop::simple`:
+//! Here is a quick example of the shorter `async_dropper::simple`:
 //!
 //! ```
 //! /// This object will be async-dropped (which must be wrapped in AsyncDropper)
@@ -60,7 +56,7 @@
 //! }
 //! ```
 //!
-//! The `async_drop::derive` is interesting because it attempts to automatically (if somewhat painfully) determine
+//! The `async_dropper::derive` is interesting because it attempts to automatically (if somewhat painfully) determine
 //! whether an object should have the defined asynchronous drop behavior performed by checking whether it is equal
 //! to `Self::default()`.
 //!
