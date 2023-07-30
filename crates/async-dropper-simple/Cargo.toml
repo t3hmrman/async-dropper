@@ -22,8 +22,6 @@ tokio = ["dep:tokio"]
 async-std = ["dep:async-std"]
 
 [dependencies]
-anyhow.workspace = true
-thiserror.workspace = true
 async-std = { workspace = true, optional = true }
 tokio = { workspace = true, optional = true }
 futures.workspace = true
