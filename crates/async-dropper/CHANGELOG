@@ -1,6 +1,18 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [0.1.0] - 2023-07-30
+
+### Miscellaneous Tasks
+
+- Prep for WIP crate release
+- Add note regarding local dev with deps
+
+### Refactor
+
+- Rename examples, prep for dropper derive v0.1.0
+- Move dropper requirements from workspace
+
 ## [0.0.1] - 2023-07-29
 
 ### Miscellaneous Tasks
