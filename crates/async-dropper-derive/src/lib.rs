@@ -36,12 +36,19 @@ fn gen_preamble(DeriveInput { ident, .. }: &DeriveInput) -> proc_macro2::TokenSt
             Panic,
         }
 
+        /// The operative trait that enables AsyncDrop functionality.
+        /// Normally, implementing only async_drop(&mut self) and reset(&mut self) is necessary.
         #[async_trait]
         trait AsyncDrop: Default + PartialEq + Eq {
             /// Operative drop that does async operations, returning
             async fn async_drop(&mut self) -> Result<(), AsyncDropError> {
                 Ok(())
             }
+
+            /// A way to reset the object (set all it's internal members to their default).
+            /// This method is used after a successful AsyncDrop, to ensure that future drops do not
+            /// perform async_drop behavior twice.
+            fn reset(&mut self);
 
             /// Timeout for drop operation, meant to be overriden if needed
             fn drop_timeout(&self) -> Duration {
@@ -73,8 +80,13 @@ fn gen_impl(_: &DeriveInput) -> proc_macro::TokenStream {
     panic!("either 'async-std' or 'tokio' features must be enabled for the async-dropper crate")
 }
 
+#[cfg(all(feature = "async-std", feature = "tokio"))]
+fn gen_impl(_: &DeriveInput) -> proc_macro::TokenStream {
+    panic!("both 'async-std' and 'tokio' features must not be enabled for the async-dropper crate")
+}
+
 /// Tokio implementation of AsyncDrop
-#[cfg(feature = "tokio")]
+#[cfg(all(feature = "tokio", not(feature = "async-std")))]
 fn gen_impl(DeriveInput { ident, .. }: &DeriveInput) -> proc_macro2::TokenStream {
     let shared_default_name = make_shared_default_name(ident);
     quote::quote!(
@@ -101,18 +113,21 @@ fn gen_impl(DeriveInput { ident, .. }: &DeriveInput) -> proc_macro2::TokenStream
                     ).await {
                         Err(e) => {
                             match drop_fail_action {
-                                DropFailAction::Continue => {}
+                                DropFailAction::Continue => original,
                                 DropFailAction::Panic => {
                                     panic!("async drop failed: {e}");
                                 }
                             }
                         },
-                        Ok(_) => {},
+                        Ok(_) => original,
                     }
                 });
 
                 // Perform a synchronous wait
-                ::futures::executor::block_on(task).unwrap();
+                let mut original = tokio::task::block_in_place(|| tokio::runtime::Handle::current().block_on(task).unwrap());
+
+                // After the async wait, we must reset all fields to the default (so future checks will fail)
+                original.reset();
             }
         }
     )
@@ -120,7 +135,7 @@ fn gen_impl(DeriveInput { ident, .. }: &DeriveInput) -> proc_macro2::TokenStream
 }
 
 /// async-std  implementation of AsyncDrop
-#[cfg(feature = "async-std")]
+#[cfg(all(feature = "async-std", not(feature = "tokio")))]
 fn gen_impl(DeriveInput { ident, ..}: &DeriveInput) -> proc_macro2::TokenStream {
     let shared_default_name = make_shared_default_name(ident);
     quote::quote!(
@@ -147,18 +162,21 @@ fn gen_impl(DeriveInput { ident, ..}: &DeriveInput) -> proc_macro2::TokenStream 
                     ).await {
                         Err(e) => {
                             match drop_fail_action {
-                                DropFailAction::Continue => {}
+                                DropFailAction::Continue => original,
                                 DropFailAction::Panic => {
                                     panic!("async drop failed: {e}");
                                 }
                             }
                         },
-                        Ok(_) => {},
+                        Ok(_) => original,
                     }
                 });
 
                 // Perform synchronous wait
-                ::futures::executor::block_on(task);
+                let mut original = ::futures::executor::block_on(task);
+
+                // Reset the task to ensure it won't trigger async drop behavior again
+                original.reset();
             }
         }
     )
