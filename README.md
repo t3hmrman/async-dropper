@@ -183,7 +183,7 @@ As a result, every `drop` you perform on a T will perform two drops -- one on a 
 
 ## Development
 
-To get started working on developing `situwatiion`, run the following [`just`][just] targets:
+To get started working on developing `async-dropper`, run the following [`just`][just] targets:
 
 ```console
 just setup build
