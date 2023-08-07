@@ -8,8 +8,7 @@ just := env_var_or_default("JUST", just_executable())
 root_dir := invocation_directory()
 package := env_var_or_default("PKG", "unset")
 
-version := `cargo get version | head --bytes=-1`
-sha := `git rev-parse --short HEAD`
+async_platform_feature := env_var_or_default("ASYNC_PLATFORM_FEATURE", "tokio")
 
 _default:
   {{just}} --list
@@ -17,14 +16,6 @@ _default:
 #############
 # Utilities #
 #############
-
-# Print the current version
-print-version:
-    @echo -n "{{version}}"
-
-# Print the current SHA
-print-sha:
-    @echo -n "{{sha}}"
 
 # Ensure a binary is present
 ensure-binary bin env_name:
@@ -59,12 +50,13 @@ lint-watch:
 
 # Build
 build:
-    {{cargo}} build
+    @echo -e "[warn] building by default for feature [{{async_platform_feature}}] (via ASYNC_PLATFORM_FEATURE)"
+    {{cargo}} build --features={{async_platform_feature}}
 
 # Build continuously (development mode)
 build-watch:
     @{{just}} ensure-binary cargo-watch CARGO_WATCH
-    {{cargo}} watch -x build
+    {{cargo}} watch -- just build
 
 # Build the release version of the binary
 build-release:
@@ -76,7 +68,8 @@ check:
 
 # Ensure that the # of commits is what we expect
 check-commit-count now before count:
-    @export COUNT=$(($(git rev-list --count {{now}} --no-merges) - $(git rev-list --count {{before}}))) && \
+    #!/bin/bash
+    export COUNT=$(($(git rev-list --count {{now}} --no-merges) - $(git rev-list --count {{before}}))) && \
     if [ "$COUNT" != "1" ]; then \
       echo -e "[error] number of commits ($COUNT) is *not* {{count}} -- please squash commits"; \
       exit 1; \
@@ -93,7 +86,7 @@ test: test-unit test-int test-examples
 # Run unit tests
 test-unit:
     @{{just}} ensure-binary cargo-nextest CARGO_NEXTEST
-    @{{cargo}} nextest run -E 'kind(lib)'
+    @{{cargo}} nextest run -F tokio     -E 'kind(lib)'
     @{{cargo}} nextest run -F async-std -E 'kind(lib)'
 
 # Run unit tests continuously
@@ -104,7 +97,8 @@ test-unit-watch:
 
 test-int:
     @{{just}} ensure-binary cargo-nextest CARGO_NEXTEST
-    @{{cargo}} nextest run -E 'kind(test)'
+    @{{cargo}} nextest run -F tokio     -E 'kind(test)'
+    @{{cargo}} nextest run -F async-std -E 'kind(test)'
 
 test-examples:
     @{{cargo}} run --example async-drop-simple-tokio --features=tokio
@@ -117,11 +111,6 @@ test-examples:
 ######################
 
 publish_crate := env_var_or_default("PUBLISH_CRATE", "no")
-changelog_file_path := env_var_or_default("CHANGELOG_FILE_PATH", "CHANGELOG")
-
-# Generate the changelog
-changelog:
-  {{git}} cliff --unreleased --tag={{version}} --prepend={{changelog_file_path}}
 
 # Generic release automation
 release version:

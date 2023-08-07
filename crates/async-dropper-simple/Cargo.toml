@@ -17,7 +17,7 @@ A simple struct-wrapper (i.e. AsyncDropper<T>) based implementation of AsyncDrop
 """
 
 [features]
-defaults = []
+default = []
 tokio = ["dep:tokio"]
 async-std = ["dep:async-std"]
 
