@@ -30,3 +30,6 @@ quote.workspace = true
 syn.workspace = true
 async-std = { workspace = true, optional = true }
 tokio = { workspace = true, optional = true }
+
+[package.metadata.docs.rs]
+features = ["tokio"]
