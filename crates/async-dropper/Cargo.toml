@@ -42,8 +42,8 @@ required-features = [ "async-std" ]
 
 [features]
 default = []
-tokio = ["dep:tokio", "async-dropper-derive/tokio"]
-async-std = ["dep:async-std", "async-dropper-derive/async-std"]
+tokio = ["dep:tokio", "async-dropper-derive/tokio", "async-dropper-simple/tokio"]
+async-std = ["dep:async-std", "async-dropper-derive/async-std", "async-dropper-simple/async-std"]
 
 [dependencies]
 async-std = { workspace = true, optional = true }
