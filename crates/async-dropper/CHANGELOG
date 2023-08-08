@@ -1,6 +1,22 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [0.2.0] - 2023-08-08
+
+### Bug Fixes
+
+- Wrong subject in cliff toml config
+- Reset default feature to neither async platform
+- Add transitive feature for simple
+
+### Miscellaneous Tasks
+
+- Update deps (derive -> v0.2.0, simple -> v0.2.0)
+
+### Refactor
+
+- Set tokio as default feature
+
 ## [0.1.3] - 2023-07-30
 
 ### Miscellaneous Tasks
