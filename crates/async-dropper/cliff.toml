@@ -40,7 +40,7 @@ commit_parsers = [
     { message = '^feat\(dropper\)', group = "Features"},
     { message = '^fix\(dropper\)', group = "Bug Fixes"},
     { message = '^fix\(dropper\)', group = "Hotfixes"},
-    { message = '^(doc|docs)\(simple\)', group = "Documentation"},
+    { message = '^(doc|docs)\(dropper\)', group = "Documentation"},
     { message = '^perf\(dropper\)', group = "Performance"},
     { message = '^pkg\(dropper\)', group = "Packaging"},
     { message = '^refactor\(dropper\)', group = "Refactor"},
