@@ -20,7 +20,7 @@ The derive macro crate that supplies the implementation for AsyncDrop
 proc-macro = true
 
 [features]
-defaults = []
+default = []
 tokio = ["dep:tokio" ]
 async-std = ["dep:async-std" ]
 

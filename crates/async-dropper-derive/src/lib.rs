@@ -77,12 +77,12 @@ fn gen_preamble(DeriveInput { ident, .. }: &DeriveInput) -> proc_macro2::TokenSt
 
 #[cfg(all(not(feature = "async-std"), not(feature = "tokio")))]
 fn gen_impl(_: &DeriveInput) -> proc_macro::TokenStream {
-    panic!("either 'async-std' or 'tokio' features must be enabled for the async-dropper crate")
+    compile_error!("either 'async-std' or 'tokio' features must be enabled for the async-dropper crate")
 }
 
 #[cfg(all(feature = "async-std", feature = "tokio"))]
 fn gen_impl(_: &DeriveInput) -> proc_macro::TokenStream {
-    panic!("both 'async-std' and 'tokio' features must not be enabled for the async-dropper crate")
+    compile_error!("both 'async-std' and 'tokio' features must not be enabled for the async-dropper crate")
 }
 
 /// Tokio implementation of AsyncDrop
