@@ -41,7 +41,7 @@ crate-type = [ "bin" ]
 required-features = [ "async-std" ]
 
 [features]
-default = ["tokio"]
+default = []
 tokio = ["dep:tokio", "async-dropper-derive/tokio"]
 async-std = ["dep:async-std", "async-dropper-derive/async-std"]
 
