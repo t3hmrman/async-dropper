@@ -1,4 +1,5 @@
-use syn::DeriveInput;
+use proc_macro2::TokenStream;
+use syn::{DataEnum, DataStruct, DataUnion, DeriveInput, Fields, FieldsNamed};
 
 #[proc_macro_derive(AsyncDrop)]
 pub fn derive_async_drop(items: proc_macro::TokenStream) -> proc_macro::TokenStream {
@@ -17,8 +18,70 @@ fn make_shared_default_name(ident: &proc_macro2::Ident) -> proc_macro2::Ident {
 
 /// Default implementation of deriving async drop that does nothing
 /// you're expected to use either the 'tokio' feature or 'async-std'
-fn gen_preamble(DeriveInput { ident, .. }: &DeriveInput) -> proc_macro2::TokenStream {
+fn gen_preamble(di: &DeriveInput) -> proc_macro2::TokenStream {
+    let ident = &di.ident;
     let shared_default_name = make_shared_default_name(ident);
+
+    // Retrieve the struct data fields from the derive input
+    let mut df_setters: Vec<TokenStream> = Vec::new();
+    match &di.data {
+        syn::Data::Struct(DataStruct { fields, .. }) => {
+            if let Fields::Unit = fields {
+                df_setters.push(
+                    syn::Error::new(ident.span(), "unit sturcts cannot be async dropped")
+                        .to_compile_error(),
+                );
+            }
+            for f in fields.iter() {
+                df_setters.push(f.ident.as_ref().map_or_else(
+                    || {
+                        syn::parse_str(
+                            format!("self.{} = Default::default()", df_setters.len()).as_str(),
+                        )
+                        .unwrap_or_else(|_| {
+                            syn::Error::new(
+                                ident.span(),
+                                "failed to generate default setter for field",
+                            )
+                            .to_compile_error()
+                        })
+                    },
+                    |id| quote::quote! { self.#id = Default::default(); },
+                ));
+            }
+        }
+        syn::Data::Enum(DataEnum { variants, .. }) => {
+            for v in variants.iter() {
+                for vf in v.fields.iter() {
+                    df_setters.push(vf.ident.as_ref().map_or_else(
+                        || {
+                            syn::parse_str(
+                                format!("self.{} = Default::default()", df_setters.len()).as_str(),
+                            )
+                            .unwrap_or_else(|_| {
+                                syn::Error::new(
+                                    ident.span(),
+                                    "failed to generate default setter for field",
+                                )
+                                .to_compile_error()
+                            })
+                        },
+                        |id| quote::quote! { self.#id = Default::default(); },
+                    ))
+                }
+            }
+        }
+        syn::Data::Union(DataUnion {
+            fields: FieldsNamed { named, .. },
+            ..
+        }) => {
+            for f in named.iter() {
+                if let Some(id) = &f.ident {
+                    df_setters.push(quote::quote! { self.#id = Default::default(); });
+                }
+            }
+        }
+    };
 
     quote::quote!(
         #[derive(Debug)]
@@ -36,10 +99,25 @@ fn gen_preamble(DeriveInput { ident, .. }: &DeriveInput) -> proc_macro2::TokenSt
             Panic,
         }
 
+        /// Types that can reset themselves to T::default()
+        trait ResetDefault {
+            fn reset_to_default(&mut self);
+        }
+
+        /// Automatically generated implementation of reset to default for #ident
+        #[automatically_derived]
+        impl ResetDefault for #ident {
+            fn reset_to_default(&mut self) {
+                #(
+                    #df_setters;
+                )*
+            }
+        }
+
         /// The operative trait that enables AsyncDrop functionality.
         /// Normally, implementing only async_drop(&mut self) and reset(&mut self) is necessary.
         #[async_trait]
-        trait AsyncDrop: Default + PartialEq + Eq {
+        trait AsyncDrop: Default + PartialEq + Eq + ResetDefault {
             /// Operative drop that does async operations, returning
             async fn async_drop(&mut self) -> Result<(), AsyncDropError> {
                 Ok(())
@@ -48,7 +126,9 @@ fn gen_preamble(DeriveInput { ident, .. }: &DeriveInput) -> proc_macro2::TokenSt
             /// A way to reset the object (set all it's internal members to their default).
             /// This method is used after a successful AsyncDrop, to ensure that future drops do not
             /// perform async_drop behavior twice.
-            fn reset(&mut self);
+            fn reset(&mut self) {
+                self.reset_to_default();
+            }
 
             /// Timeout for drop operation, meant to be overriden if needed
             fn drop_timeout(&self) -> Duration {
@@ -60,6 +140,7 @@ fn gen_preamble(DeriveInput { ident, .. }: &DeriveInput) -> proc_macro2::TokenSt
                 DropFailAction::Continue
             }
         }
+
 
         /// Utility function unique to #ident which retrieves a shared mutable single default instance of it
         /// that single default instance is compared to other instances and indicates whether async drop
@@ -77,12 +158,16 @@ fn gen_preamble(DeriveInput { ident, .. }: &DeriveInput) -> proc_macro2::TokenSt
 
 #[cfg(all(not(feature = "async-std"), not(feature = "tokio")))]
 fn gen_impl(_: &DeriveInput) -> proc_macro::TokenStream {
-    compile_error!("either 'async-std' or 'tokio' features must be enabled for the async-dropper crate")
+    compile_error!(
+        "either 'async-std' or 'tokio' features must be enabled for the async-dropper crate"
+    );
 }
 
 #[cfg(all(feature = "async-std", feature = "tokio"))]
 fn gen_impl(_: &DeriveInput) -> proc_macro::TokenStream {
-    compile_error!("both 'async-std' and 'tokio' features must not be enabled for the async-dropper crate")
+    compile_error!(
+        "both 'async-std' and 'tokio' features must not be enabled for the async-dropper crate"
+    )
 }
 
 /// Tokio implementation of AsyncDrop
@@ -138,7 +223,7 @@ fn gen_impl(DeriveInput { ident, .. }: &DeriveInput) -> proc_macro2::TokenStream
 
 /// async-std  implementation of AsyncDrop
 #[cfg(all(feature = "async-std", not(feature = "tokio")))]
-fn gen_impl(DeriveInput { ident, ..}: &DeriveInput) -> proc_macro2::TokenStream {
+fn gen_impl(DeriveInput { ident, .. }: &DeriveInput) -> proc_macro2::TokenStream {
     let shared_default_name = make_shared_default_name(ident);
     quote::quote!(
         #[automatically_derived]

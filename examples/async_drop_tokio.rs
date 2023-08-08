@@ -13,26 +13,34 @@ use async_trait::async_trait;
 /// Objects that are dropped *must* implement [Default] and [PartialEq]
 /// (so make members optional, hide them behind Rc/Arc as necessary)
 #[derive(Debug, Default, PartialEq, Eq, AsyncDrop)]
-struct AsyncThing(String);
+struct AsyncThing {
+    value: String,
+}
+
+// async_dropper also works with tuple structs!
+//
+// #[derive(Debug, Default, PartialEq, Eq, AsyncDrop)]
+// struct AsyncTupleThing(String);
 
 /// Implementation of [AsyncDrop] that specifies the actual behavior
 #[async_trait]
 impl AsyncDrop for AsyncThing {
     async fn async_drop(&mut self) -> Result<(), AsyncDropError> {
         // Wait 2 seconds then "succeed"
-        eprintln!("async dropping [{}]!", self.0);
+        eprintln!("async dropping [{:?}]!", self);
         tokio::time::sleep(Duration::from_secs(2)).await;
-        eprintln!("dropped [{}]!", self.0);
+        eprintln!("dropped [{:?}]!", self);
         Ok(())
     }
 
-    fn reset(&mut self) {
-        self.0 = String::default();
+    fn drop_timeout(&self) -> Duration {
+        Duration::from_secs(5) // extended from default 3 seconds, as an example
     }
 
-    fn drop_timeout(&self) -> Duration {
-        Duration::from_secs(5) // extended from default 3 seconds
-    }
+    // NOTE: the method below is automatically derived for you, but you can override it
+    // fn reset(&mut self) {
+    //     self.value = String::default();
+    // }
 
     // NOTE: below was not implemented since we want the default of DropFailAction::Contineue
     // fn drop_fail_action(&self) -> DropFailAction;
@@ -41,6 +49,6 @@ impl AsyncDrop for AsyncThing {
 #[tokio::main]
 #[allow(dead_code)]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    drop(AsyncThing(String::from("test")));
+    drop(AsyncThing { value: String::from("test")});
     Ok(())
 }
