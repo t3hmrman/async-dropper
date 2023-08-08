@@ -54,5 +54,5 @@ release version:
     {{git}} tag {{name}}-v`just print-version`
     {{git}} push origin {{name}}-v`just print-version`
     if [ "{{publish_crate}}" = "yes" ]; then \
-      {{cargo}} publish -p {{name}}; \
+      {{cargo}} publish -p {{name}} --features tokio; \
     fi
