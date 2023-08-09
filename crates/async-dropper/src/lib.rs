@@ -27,25 +27,21 @@
 //!
 //! Note that `AsyncThing` must be wrapped in `async_dropper::simple::AsyncDropper`.
 //!
-//! For `async_dropper::derive`:
+//! For `async_dropper::derive`, the simplest example looks like this:
 //!
 //! ```
 //! use async_dropper::derive::AsyncDrop;
 //!
+//! // Your struct (named field structs and tuple structs both work)
 //! #[derive(Debug, Default, PartialEq, Eq, AsyncDrop)]
 //! struct AsyncThing(String);
 //!
-//! /// Implementation of [AsyncDrop] that specifies the actual behavior
+//! /// How it drops, asynchrounously
 //! #[async_trait]
 //! impl AsyncDrop for AsyncThing {
 //!     async fn async_drop(&mut self) -> Result<(), AsyncDropError> {
 //!         tokio::time::sleep(Duration::from_secs(2)).await; // fake work
 //!         Ok(())
-//!     }
-//!
-//!     // This method resets an instance of T to equal T::default()
-//!     fn reset(&mut self) {
-//!         self.0 = String::default();
 //!     }
 //! }
 //!
@@ -61,6 +57,8 @@
 //! to `Self::default()`.
 //!
 //! **Said differently, async drop behavior is skipped if an instance of `T` is exactly equal to a `T::default()`**.
+//!
+//! For convenience, a `reset(&mut self)` function that sets any T to T::default() is automatically derived, but it can be overriden via `AsyncDrop#reset()`.
 //!
 //! If `T` is *not* exactly equal to `T::default()`, the assumption is that `T` must still be holding things that require asynchronous dropping behavior, and as such that behavior will be performed.
 //!
