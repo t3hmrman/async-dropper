@@ -53,7 +53,7 @@ async-trait.workspace = true
 # NOTE: version has to be removed if doing local dev with unpublished versions
 # cargo does *not* ignore the version and opt for path
 async-dropper-derive = { path = "../async-dropper-derive", version = "0.2.4" }
-async-dropper-simple = { path = "../async-dropper-simple", version = "0.2.2" }
+async-dropper-simple = { path = "../async-dropper-simple", version = "0.2.3" }
 
 [dev-dependencies]
 tokio = { workspace = true, features = [ "time", "macros", "rt", "rt-multi-thread" ]}
