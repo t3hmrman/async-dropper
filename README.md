@@ -26,8 +26,8 @@ If you're editing `Cargo.toml` by hand, **choose one** of the following lines:
 
 ```toml
 [dependencies]
-#async-dropper = { version = "0.1", features = [ "tokio" ] }
-#async-dropper = { version = "0.1", features = [ "async-std" ] }
+#async-dropper = { version = "0.2", features = [ "tokio" ] }
+#async-dropper = { version = "0.2", features = [ "async-std" ] }
 ```
 
 > **Warning**
