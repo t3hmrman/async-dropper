@@ -32,4 +32,6 @@ async-std = { workspace = true, optional = true }
 tokio = { workspace = true, optional = true }
 
 [package.metadata.docs.rs]
+all-features = false
+no-default-features = true
 features = ["tokio"]
