@@ -58,3 +58,8 @@ async-dropper-simple = { path = "../async-dropper-simple", version = "0.2.2" }
 [dev-dependencies]
 tokio = { workspace = true, features = [ "time", "macros", "rt", "rt-multi-thread" ]}
 async-std = { workspace = true, features = [ "attributes" ]}
+
+[package.metadata.docs.rs]
+all-features = false
+no-default-features = true
+features = ["tokio"]
