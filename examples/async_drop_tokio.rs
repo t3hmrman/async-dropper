@@ -38,6 +38,7 @@ impl AsyncDrop for AsyncThing {
     }
 
     // NOTE: the method below is automatically derived for you, but you can override it
+    // make sure that the object is equal to T::default() by the end, otherwise it will panic!
     // fn reset(&mut self) {
     //     self.value = String::default();
     // }

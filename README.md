@@ -120,16 +120,15 @@ impl AsyncDrop for AsyncThing {
         Ok(())
     }
 
-    // This function serves to indicate when async_drop behavior should *not* be performed
-    // (i.e., if Self::default == Self, a drop must have occurred, or does not need to)
-    fn reset(&mut self) {
-        self.0 = String::default();
+    fn drop_timeout(&self) -> Duration {
+        Duration::from_secs(5) // extended from default 3 seconds, as an example
     }
 
-    // How long we can allow async drop behavior to block
-    fn drop_timeout(&self) -> Duration {
-        Duration::from_secs(5) // extended from default 3 seconds
-    }
+    // NOTE: the method below is automatically derived for you, but you can override it
+    // make sure that the object is equal to T::default() by the end, otherwise it will panic!
+    // fn reset(&mut self) {
+    //     self.0 = String::default();
+    // }
 
     // NOTE: below was not implemented since we want the default of DropFailAction::Continue
     // fn drop_fail_action(&self) -> DropFailAction;
