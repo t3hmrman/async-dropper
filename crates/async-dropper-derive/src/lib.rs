@@ -5,7 +5,7 @@ use syn::{DataEnum, DataStruct, DataUnion, DeriveInput, Fields, FieldsNamed};
 pub fn derive_async_drop(items: proc_macro::TokenStream) -> proc_macro::TokenStream {
     match syn::parse2::<DeriveInput>(items.into()) {
         Ok(derive_input) => proc_macro2::TokenStream::from_iter(
-            [gen_preamble(&derive_input), gen_impl(&derive_input).into()].into_iter(),
+            [gen_preamble(&derive_input), gen_impl(&derive_input)],
         )
         .into(),
         Err(e) => e.to_compile_error().into(),
@@ -153,7 +153,6 @@ fn gen_preamble(di: &DeriveInput) -> proc_macro2::TokenStream {
         }
 
     )
-    .into()
 }
 
 #[cfg(all(not(feature = "async-std"), not(feature = "tokio")))]
@@ -218,7 +217,6 @@ fn gen_impl(DeriveInput { ident, .. }: &DeriveInput) -> proc_macro2::TokenStream
             }
         }
     )
-    .into()
 }
 
 /// async-std  implementation of AsyncDrop
