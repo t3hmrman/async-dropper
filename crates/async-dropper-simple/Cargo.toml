@@ -1,6 +1,6 @@
 [package]
 name = "async-dropper-simple"
-version = "0.2.3"
+version = "0.2.4"
 repository = "https://github.com/t3hmrman/async-dropper"
 license = "MIT"
 readme = "README.md"
