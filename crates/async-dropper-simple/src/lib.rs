@@ -1,6 +1,6 @@
 #![cfg_attr(all(doc, CHANNEL_NIGHTLY), feature(doc_cfg))]
-///! The code in this file was shamelessly stolen from
-///! https://stackoverflow.com/questions/71541765/rust-async-drop
+//! The code in this file was shamelessly stolen from
+//! https://stackoverflow.com/questions/71541765/rust-async-drop
 
 use std::time::Duration;
 
@@ -58,7 +58,7 @@ impl<T: AsyncDrop + Default + Send + 'static> Drop for AsyncDropper<T> {
             this.dropped = true;
 
             // Create task
-            let timeout = self.timeout.clone();
+            let timeout = self.timeout;
             let task = tokio::spawn(async move {
                 this.inner.async_drop().await;
             });
