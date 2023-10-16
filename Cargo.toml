@@ -1,4 +1,5 @@
 [workspace]
+resolver = "2"
 members = [
   "crates/async-dropper",
   "crates/async-dropper-derive",

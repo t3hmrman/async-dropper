@@ -41,7 +41,7 @@ fmt:
 
 # Lint
 lint:
-    {{cargo}} clippy
+    {{cargo}} clippy --all-targets --features=tokio
 
 # Lint the project
 lint-watch:
