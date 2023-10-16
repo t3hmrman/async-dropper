@@ -8,9 +8,9 @@ members = [
 
 [workspace.dependencies]
 async-std = "1.12.0"
-tokio = "1.29.1"
-async-trait = "0.1.69"
-proc-macro2 = "1.0.66"
-quote = "1.0.32"
-syn = "2.0.27"
+tokio = "1.33.0"
+async-trait = "0.1.74"
+proc-macro2 = "1.0.69"
+quote = "1.0.33"
+syn = "2.0.38"
 futures = "0.3.28"
