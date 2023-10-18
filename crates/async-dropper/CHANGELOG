@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [0.2.5] - 2023-10-18
+
+### Miscellaneous Tasks
+
+- Update deps (async-dropper-derive -> v0.2.6)
+
 ## [0.2.4] - 2023-10-16
 
 ### Bug Fixes
