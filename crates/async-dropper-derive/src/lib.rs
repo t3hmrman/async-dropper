@@ -131,8 +131,8 @@ fn gen_preamble(di: &DeriveInput) -> proc_macro2::TokenStream {
             }
 
             /// Timeout for drop operation, meant to be overriden if needed
-            fn drop_timeout(&self) -> Duration {
-                Duration::from_secs(3)
+            fn drop_timeout(&self) -> std::time::Duration {
+                std::time::Duration::from_secs(3)
             }
 
             /// What to do what a drop fails
