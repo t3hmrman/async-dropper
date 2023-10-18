@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [0.2.6] - 2023-10-18
+
+### Bug Fixes
+
+- Unqualified use of std::time::Duration in macro
+
 ## [0.2.5] - 2023-10-16
 
 ### Bug Fixes
