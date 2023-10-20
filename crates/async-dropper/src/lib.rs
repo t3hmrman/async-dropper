@@ -75,7 +75,7 @@ extern crate async_dropper_derive;
 pub use async_dropper_derive::AsyncDrop;
 
 #[cfg(feature = "simple")]
-pub use async_dropper_simple::{AsyncDropper, AsyncDrop};
+pub use async_dropper_simple::{AsyncDrop, AsyncDropper};
 
 #[cfg(all(feature = "simple", feature = "derive"))]
 compile_error!("both 'derive' and 'simple' features cannot be enabled at the same time");
