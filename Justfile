@@ -9,6 +9,7 @@ root_dir := invocation_directory()
 package := env_var_or_default("PKG", "unset")
 
 async_platform_feature := env_var_or_default("ASYNC_PLATFORM_FEATURE", "tokio")
+dropper_strategy_feature := env_var_or_default("DROPPER_STRATEGY_FEATURE", "derive")
 
 _default:
   {{just}} --list
@@ -41,7 +42,7 @@ fmt:
 
 # Lint
 lint:
-    {{cargo}} clippy --all-targets --features=tokio
+    {{cargo}} clippy --all-targets --features=tokio,derive
 
 # Lint the project
 lint-watch:
@@ -51,7 +52,7 @@ lint-watch:
 # Build
 build:
     @echo -e "[warn] building by default for feature [{{async_platform_feature}}] (via ASYNC_PLATFORM_FEATURE)"
-    {{cargo}} build --features={{async_platform_feature}}
+    {{cargo}} build --features={{async_platform_feature}},{{dropper_strategy_feature}}
 
 # Build continuously (development mode)
 build-watch:
