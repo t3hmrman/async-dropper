@@ -6,12 +6,8 @@ license = "MIT"
 readme = "README.md"
 edition = "2021"
 rust-version = "1.70"
-authors = [
-  "vados <vados@vadosware.io>",
-]
-categories = [
-  "asynchronous",
-]
+authors = ["vados <vados@vadosware.io>"]
+categories = ["asynchronous"]
 description = """
 A simple struct-wrapper (i.e. AsyncDropper<T>) based implementation of AsyncDrop
 """
@@ -23,7 +19,11 @@ async-std = ["dep:async-std"]
 
 [dependencies]
 async-std = { workspace = true, optional = true }
-tokio = { workspace = true, optional = true, features = [ "time", "rt", "rt-multi-thread" ] }
+tokio = { workspace = true, optional = true, features = [
+  "time",
+  "rt",
+  "rt-multi-thread",
+] }
 futures.workspace = true
 async-trait.workspace = true
 
@@ -31,7 +31,12 @@ async-trait.workspace = true
 rustc_version = "0.4.0"
 
 [dev-dependencies]
-tokio = { workspace = true, features = [ "time", "macros", "rt", "rt-multi-thread" ]}
+tokio = { workspace = true, features = [
+  "time",
+  "macros",
+  "rt",
+  "rt-multi-thread",
+] }
 
 [package.metadata.docs.rs]
 all-features = false
