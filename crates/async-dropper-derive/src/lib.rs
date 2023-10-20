@@ -4,9 +4,10 @@ use syn::{DataEnum, DataStruct, DataUnion, DeriveInput, Fields, FieldsNamed};
 #[proc_macro_derive(AsyncDrop)]
 pub fn derive_async_drop(items: proc_macro::TokenStream) -> proc_macro::TokenStream {
     match syn::parse2::<DeriveInput>(items.into()) {
-        Ok(derive_input) => proc_macro2::TokenStream::from_iter(
-            [gen_preamble(&derive_input), gen_impl(&derive_input)],
-        )
+        Ok(derive_input) => proc_macro2::TokenStream::from_iter([
+            gen_preamble(&derive_input),
+            gen_impl(&derive_input),
+        ])
         .into(),
         Err(e) => e.to_compile_error().into(),
     }
