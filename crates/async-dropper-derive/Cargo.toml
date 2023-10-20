@@ -1,6 +1,6 @@
 [package]
 name = "async-dropper-derive"
-version = "0.2.6"
+version = "0.3.0"
 repository = "https://github.com/t3hmrman/async-dropper"
 license = "MIT"
 readme = "README.md"
