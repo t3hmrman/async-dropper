@@ -84,63 +84,15 @@ fn gen_preamble(di: &DeriveInput) -> proc_macro2::TokenStream {
     };
 
     quote::quote!(
-        #[derive(Debug)]
-        pub enum AsyncDropError {
-            UnexpectedError(Box<dyn std::error::Error>),
-            Timeout,
-        }
-
-        /// What to do when a drop fails
-        #[derive(Debug, PartialEq, Eq)]
-        pub enum DropFailAction {
-            // Ignore the failed drop
-            Continue,
-            // Elevate the drop failure to a full on panic
-            Panic,
-        }
-
-        /// Types that can reset themselves to T::default()
-        trait ResetDefault {
-            fn reset_to_default(&mut self);
-        }
-
         /// Automatically generated implementation of reset to default for #ident
         #[automatically_derived]
-        impl ResetDefault for #ident {
+        impl ::async_dropper::ResetDefault for #ident {
             fn reset_to_default(&mut self) {
                 #(
                     #df_setters;
                 )*
             }
         }
-
-        /// The operative trait that enables AsyncDrop functionality.
-        /// Normally, implementing only async_drop(&mut self) and reset(&mut self) is necessary.
-        #[async_trait]
-        trait AsyncDrop: Default + PartialEq + Eq + ResetDefault {
-            /// Operative drop that does async operations, returning
-            async fn async_drop(&mut self) -> Result<(), AsyncDropError> {
-                Ok(())
-            }
-
-            /// A way to reset the object (set all it's internal members to their default).
-            /// This method is used after a successful AsyncDrop, to ensure that future drops do not
-            /// perform async_drop behavior twice.
-            fn reset(&mut self) {
-                self.reset_to_default();
-            }
-
-            /// Timeout for drop operation, meant to be overriden if needed
-            fn drop_timeout(&self) -> std::time::Duration {
-                std::time::Duration::from_secs(3)
-            }
-
-            /// What to do what a drop fails
-            fn drop_fail_action(&self) -> DropFailAction {
-                DropFailAction::Continue
-            }
-        }
-
 
         /// Utility function unique to #ident which retrieves a shared mutable single default instance of it
         /// that single default instance is compared to other instances and indicates whether async drop
@@ -189,15 +141,15 @@ fn gen_impl(DeriveInput { ident, .. }: &DeriveInput) -> proc_macro2::TokenStream
 
                 // Spawn a task to do the drop
                 let task = ::tokio::spawn(async move {
-                    let drop_fail_action = original.drop_fail_action();
+                    let drop_fail_action = <#ident as ::async_dropper::AsyncDrop>::drop_fail_action(&original);
                     match ::tokio::time::timeout(
-                        original.drop_timeout(),
-                        original.async_drop(),
+                        <#ident as ::async_dropper::AsyncDrop>::drop_timeout(&original),
+                        <#ident as ::async_dropper::AsyncDrop>::async_drop(&mut original),
                     ).await {
                         Err(e) => {
                             match drop_fail_action {
-                                DropFailAction::Continue => original,
-                                DropFailAction::Panic => {
+                                ::async_dropper::DropFailAction::Continue => original,
+                                ::async_dropper::DropFailAction::Panic => {
                                     panic!("async drop failed: {e}");
                                 }
                             }
@@ -210,7 +162,7 @@ fn gen_impl(DeriveInput { ident, .. }: &DeriveInput) -> proc_macro2::TokenStream
                 let mut original = ::tokio::task::block_in_place(|| ::tokio::runtime::Handle::current().block_on(task).unwrap());
 
                 // After the async wait, we must reset all fields to the default (so future checks will fail)
-                original.reset();
+                <#ident as ::async_dropper::AsyncDrop>::reset(&mut original);
                 if *thing.lock().unwrap() != original {
                     panic!("after calling AsyncDrop::reset(), the object does *not* equal T::default()");
                 }
@@ -239,15 +191,15 @@ fn gen_impl(DeriveInput { ident, .. }: &DeriveInput) -> proc_macro2::TokenStream
 
                 // Spawn a task to do the drop
                 let task = ::async_std::task::spawn(async move {
-                    let drop_fail_action = original.drop_fail_action();
+                    let drop_fail_action = <#ident as ::async_dropper::AsyncDrop>::drop_fail_action(&original);
                     match ::async_std::future::timeout(
-                        original.drop_timeout(),
-                        original.async_drop(),
+                        <#ident as ::async_dropper::AsyncDrop>::drop_timeout(&original),
+                        <#ident as ::async_dropper::AsyncDrop>::async_drop(&mut original),
                     ).await {
                         Err(e) => {
                             match drop_fail_action {
-                                DropFailAction::Continue => original,
-                                DropFailAction::Panic => {
+                                ::async_dropper::DropFailAction::Continue => original,
+                                ::async_dropper::DropFailAction::Panic => {
                                     panic!("async drop failed: {e}");
                                 }
                             }
@@ -260,7 +212,7 @@ fn gen_impl(DeriveInput { ident, .. }: &DeriveInput) -> proc_macro2::TokenStream
                 let mut original = ::futures::executor::block_on(task);
 
                 // Reset the task to ensure it won't trigger async drop behavior again
-                original.reset();
+                <#ident as ::async_dropper::AsyncDrop>::reset(&mut original);
                 if *thing.lock().unwrap() != original {
                     panic!("after calling AsyncDrop::reset(), the object does *not* equal T::default()");
                 }
