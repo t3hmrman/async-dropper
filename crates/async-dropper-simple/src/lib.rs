@@ -38,14 +38,18 @@ impl<T: AsyncDrop + Default + Send + 'static> AsyncDropper<T> {
 #[cfg(all(not(feature = "tokio"), not(feature = "async-std")))]
 impl<T: AsyncDrop + Default + Send + 'static> Drop for AsyncDropper<T> {
     fn drop(&mut self) {
-        compile_error!("either 'async-std' or 'tokio' features must be enabled for the async-dropper crate")
+        compile_error!(
+            "either 'async-std' or 'tokio' features must be enabled for the async-dropper crate"
+        )
     }
 }
 
 #[cfg(all(feature = "async-std", feature = "tokio"))]
 impl<T: AsyncDrop + Default + Send + 'static> Drop for AsyncDropper<T> {
     fn drop(&mut self) {
-        compile_error!("'async-std' and 'tokio' features cannot both be specified for the async-dropper crate")
+        compile_error!(
+            "'async-std' and 'tokio' features cannot both be specified for the async-dropper crate"
+        )
     }
 }
 
