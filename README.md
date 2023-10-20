@@ -31,11 +31,11 @@ If you're editing `Cargo.toml` by hand, **choose one** of the following lines:
 
 ```toml
 [dependencies]
-#async-dropper = { version = "0.2", features = [ "tokio", "derive" ] }
-#async-dropper = { version = "0.2", features = [ "tokio", "simple" ] }
+#async-dropper = { version = "0.3", features = [ "tokio", "derive" ] }
+#async-dropper = { version = "0.3", features = [ "tokio", "simple" ] }
 
-#async-dropper = { version = "0.2", features = [ "async-std", "derive" ] }
-#async-dropper = { version = "0.2", features = [ "async-std", "simple" ] }
+#async-dropper = { version = "0.3", features = [ "async-std", "derive" ] }
+#async-dropper = { version = "0.3", features = [ "async-std", "simple" ] }
 ```
 
 > **Warning**
@@ -46,7 +46,7 @@ If you're editing `Cargo.toml` by hand, **choose one** of the following lines:
 
 ### `async_dropper::simple`
 
-To use the "simple" version which uses a wrapper struct (`AsyncDropper<T>`), see [`examples/async_drop_simple.rs`](./examples/async_drop_simple.rs):
+To use the "simple" version which uses a wrapper struct (`AsyncDropper<T>`), see [`examples/simple_tokio.rs`](./examples/simple_tokio.rs):
 
 ```rust
 use std::{
@@ -89,7 +89,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 You can run the example and see the output:
 
 ```console
-cargo run --example async-drop-simple --features=tokio
+cargo run --example simple-tokio --features=tokio
 ```
 
 ### `async_dropper::derive`
@@ -100,7 +100,7 @@ The derive macro is a novel (and possibly foolhardy) attempt to implement `Async
 
 For this approach to work well your `T` should have cheap-to-create `Default`s, and comparing a default value to an existing value should meaningfully differ (and identify an object that is no longer in use). **Please think thoroughly about whether this model works for your use case**.
 
-For an example, see [`examples/async_drop.rs`](./examples/async_drop.rs):
+For an example, see [`examples/derive_tokio.rs`](./examples/derive_tokio.rs):
 
 ```rust
 use std::{
@@ -159,7 +159,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 You can run the example and see the output:
 
 ```console
-cargo run --example async-drop --features=tokio
+cargo run --example derive-tokio --features=tokio
 ```
 
 ## Supported environments
@@ -176,9 +176,17 @@ cargo run --example async-drop --features=tokio
 
 ## FAQ
 
-### Why does `async-dropper` assume that I'm using *either* `async-std` or `tokio`
+### Why does `async-dropper` assume that I'm using *either* `async-std` or `tokio`?
 
-Because you probably are. If this is a problem for you, it *can* be changed, please file an issue.
+Because you probably are. If this is a problem for you, it *can* be changed, please [file an issue][create-issue].
+
+### Why do I have to choose between `simple` and `derive` features?
+
+The `simple` strategy and `derive` strategy impose different requirements on the `T` on which they act.
+
+To avoid requiring unnnecessary and possibly incompatible traits, you should choose *one* of the features (i.e. approaches) to go with.
+
+If this "feature" presents an issue for you, it *can* be changed, please [file an issue][create-issue].
 
 ### What does `async_dropper::derive` cost?
 
@@ -230,4 +238,6 @@ PUBLISH_CRATE=yes PKG=async-dropper-simple just release patch
 
 ## Contributing
 
-Contributions are welcome! If you find a bug or an impovement that should be included in `async-dropper`, [create an issue](https://github.com/t3hmrman/async-dropper/issues) or open a pull request.
+Contributions are welcome! If you find a bug or an impovement that should be included in `async-dropper`, [create an issue][crate-issue] or open a pull request.
+
+[create-issue]: https://github.com/t3hmrman/async-dropper/issues
