@@ -78,4 +78,4 @@ async-std = { workspace = true, features = ["attributes"] }
 [package.metadata.docs.rs]
 all-features = false
 no-default-features = true
-features = ["tokio"]
+features = ["tokio", "derive"]
