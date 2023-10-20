@@ -2,8 +2,8 @@
 
 `async-dropper` is probably the least-worst ad-hoc `AsyncDrop` implementation you've seen, and it works in two ways:
 
-- `async_dropper::simple` is stolen nearly verbatim from [this StackOverflow answer](https://stackoverflow.com/a/75584109) (thanks to [`paholg`](https://stackoverflow.com/users/2977291/paholg)!)
-- `async_dropper::derive` provides a trait called `AsyncDrop` and corresponding [derive macro][rust-derive-macro], which try to use `Default` and `PartialEq` to determine when to async drop.
+- `async_dropper::AsyncDropper` is stolen nearly verbatim from [this StackOverflow answer](https://stackoverflow.com/a/75584109) (thanks to [`paholg`](https://stackoverflow.com/users/2977291/paholg)!)
+- `async_dropper::AsyncDrop` is a Trait and [custom derive macro][rust-derive-macro], which try to use `Default` and `PartialEq` to determine when to async drop, automatically while `Drop`ing.
 
 The code in this crate was most directly inspired by [this StackOverflow thread on Async Drop](https://stackoverflow.com/questions/71541765/rust-async-drop) and many other conversations:
 
@@ -15,23 +15,32 @@ The code in this crate was most directly inspired by [this StackOverflow thread 
 
 ## Install
 
-You **must** set features on this crate, as it works with async runtimes:
+You **must** set features on this crate, as it works with both async runtimes, and can use *either* approach outlined above:
 
 ```console
-cargo add async-dropper --features tokio     # use tokio
-cargo add async-dropper --features async-std # use async-std
+# if using tokio, choose one of the two lines below
+cargo add async-dropper --features tokio,derive     # use tokio, with the derive approach
+cargo add async-dropper --features tokio,simple     # use tokio, with the simple approach
+
+# if using async-std, chose one of the two lines below
+cargo add async-dropper --features async-std,derive # use async-std, with the derive approach
+cargo add async-dropper --features async-std,simple # use async-std, with the simple approach
 ```
 
 If you're editing `Cargo.toml` by hand, **choose one** of the following lines:
 
 ```toml
 [dependencies]
-#async-dropper = { version = "0.2", features = [ "tokio" ] }
-#async-dropper = { version = "0.2", features = [ "async-std" ] }
+#async-dropper = { version = "0.2", features = [ "tokio", "derive" ] }
+#async-dropper = { version = "0.2", features = [ "tokio", "simple" ] }
+
+#async-dropper = { version = "0.2", features = [ "async-std", "derive" ] }
+#async-dropper = { version = "0.2", features = [ "async-std", "simple" ] }
 ```
 
 > **Warning**
 > `async-dropper` does not allow using both `async-std` and `tokio` features at the same time (see [the FAQ below](#FAQ)).
+> You *can*, however, use both the `simple` and `derive` features at the same time
 
 ## Quickstart
 

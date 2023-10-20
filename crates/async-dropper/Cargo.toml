@@ -6,58 +6,74 @@ license = "MIT"
 readme = "README.md"
 edition = "2021"
 rust-version = "1.70"
-authors = [
-  "vados <vados@vadosware.io>",
-]
-categories = [
-  "asynchronous",
-]
+authors = ["vados <vados@vadosware.io>"]
+categories = ["asynchronous"]
 description = """
 The least-worst ad-hoc implementation of AsyncDrop as a Derive macro
 """
 
 [[example]]
-name = "async-drop-tokio"
-path = "../../examples/async_drop_tokio.rs"
-crate-type = [ "bin" ]
-required-features = [ "tokio" ]
+name = "derive-tokio"
+path = "../../examples/derive_tokio.rs"
+crate-type = ["bin"]
+required-features = ["tokio", "derive"]
 
 [[example]]
-name = "async-drop-async-std"
-path = "../../examples/async_drop_async_std.rs"
-crate-type = [ "bin" ]
-required-features = [ "async-std" ]
+name = "derive-async-std"
+path = "../../examples/derive_async_std.rs"
+crate-type = ["bin"]
+required-features = ["async-std", "derive"]
 
 [[example]]
-name = "async-drop-simple-tokio"
-path = "../../examples/async_drop_simple_tokio.rs"
-crate-type = [ "bin" ]
-required-features = [ "tokio" ]
+name = "simple-tokio"
+path = "../../examples/simple_tokio.rs"
+crate-type = ["bin"]
+required-features = ["tokio", "simple"]
 
 [[example]]
-name = "async-drop-simple-async-std"
-path = "../../examples/async_drop_simple_async_std.rs"
-crate-type = [ "bin" ]
-required-features = [ "async-std" ]
+name = "simple-async-std"
+path = "../../examples/simple_async_std.rs"
+crate-type = ["bin"]
+required-features = ["async-std", "simple"]
 
 [features]
 default = []
-tokio = ["dep:tokio", "async-dropper-derive/tokio", "async-dropper-simple/tokio"]
-async-std = ["dep:async-std", "async-dropper-derive/async-std", "async-dropper-simple/async-std"]
+simple = []
+derive = []
+tokio = [
+  "dep:tokio",
+  "async-dropper-derive/tokio",
+  "async-dropper-simple/tokio",
+]
+async-std = [
+  "dep:async-std",
+  "async-dropper-derive/async-std",
+  "async-dropper-simple/async-std",
+]
 
 [dependencies]
-async-std = { workspace = true, optional = true }
-tokio = { workspace = true, optional = true, features = [ "rt", "rt-multi-thread" ] }
-futures.workspace = true
 async-trait.workspace = true
+async-std = { workspace = true, optional = true }
+futures.workspace = true
+
+tokio = { workspace = true, optional = true, features = [
+  "rt",
+  "rt-multi-thread",
+] }
+
 # NOTE: version has to be removed if doing local dev with unpublished versions
 # cargo does *not* ignore the version and opt for path
 async-dropper-derive = { path = "../async-dropper-derive", version = "0.2.6" }
 async-dropper-simple = { path = "../async-dropper-simple", version = "0.2.4" }
 
 [dev-dependencies]
-tokio = { workspace = true, features = [ "time", "macros", "rt", "rt-multi-thread" ]}
-async-std = { workspace = true, features = [ "attributes" ]}
+tokio = { workspace = true, features = [
+  "time",
+  "macros",
+  "rt",
+  "rt-multi-thread",
+] }
+async-std = { workspace = true, features = ["attributes"] }
 
 [package.metadata.docs.rs]
 all-features = false

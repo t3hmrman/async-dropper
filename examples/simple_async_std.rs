@@ -1,9 +1,7 @@
-use std::{
-    result::Result,
-    time::Duration,
-};
+use std::result::Result;
+use std::time::Duration;
 
-use async_dropper_simple::{AsyncDrop, AsyncDropper};
+use async_dropper::{AsyncDrop, AsyncDropper};
 use async_trait::async_trait;
 
 // NOTE: this example is rooted in crates/async-dropper

@@ -86,8 +86,10 @@ test: test-unit test-int test-examples
 # Run unit tests
 test-unit:
     @{{just}} ensure-binary cargo-nextest CARGO_NEXTEST
-    @{{cargo}} nextest run -F tokio     -E 'kind(lib)'
-    @{{cargo}} nextest run -F async-std -E 'kind(lib)'
+    @{{cargo}} nextest run -F tokio,derive     -E 'kind(lib)'
+    @{{cargo}} nextest run -F tokio,simple     -E 'kind(lib)'
+    @{{cargo}} nextest run -F async-std,derive -E 'kind(lib)'
+    @{{cargo}} nextest run -F async-std,simple -E 'kind(lib)'
 
 # Run unit tests continuously
 test-unit-watch:
@@ -97,14 +99,16 @@ test-unit-watch:
 
 test-int:
     @{{just}} ensure-binary cargo-nextest CARGO_NEXTEST
-    @{{cargo}} nextest run -F tokio     -E 'kind(test)'
-    @{{cargo}} nextest run -F async-std -E 'kind(test)'
+    @{{cargo}} nextest run -F tokio,derive     -E 'kind(test)'
+    @{{cargo}} nextest run -F tokio,simple     -E 'kind(test)'
+    @{{cargo}} nextest run -F async-std,derive -E 'kind(test)'
+    @{{cargo}} nextest run -F async-std,simple -E 'kind(test)'
 
 test-examples:
-    @{{cargo}} run --example async-drop-simple-tokio --features=tokio
-    @{{cargo}} run --example async-drop-simple-async-std --features=async-std
-    @{{cargo}} run --example async-drop-tokio --features=tokio
-    @{{cargo}} run --example async-drop-async-std --features=async-std
+    @{{cargo}} run --example simple-tokio --features=tokio,simple
+    @{{cargo}} run --example simple-async-std --features=async-std,simple
+    @{{cargo}} run --example derive-tokio --features=tokio,derive
+    @{{cargo}} run --example derive-async-std --features=async-std,derive
 
 ######################
 # Release Management #
