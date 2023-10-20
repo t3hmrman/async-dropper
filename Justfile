@@ -110,6 +110,7 @@ test-examples:
     @{{cargo}} run --example simple-async-std --features=async-std,simple
     @{{cargo}} run --example derive-tokio --features=tokio,derive
     @{{cargo}} run --example derive-async-std --features=async-std,derive
+    @{{cargo}} run --example derive-two-tokio --features=tokio,derive
 
 ######################
 # Release Management #

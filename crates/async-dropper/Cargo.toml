@@ -36,6 +36,12 @@ path = "../../examples/simple_async_std.rs"
 crate-type = ["bin"]
 required-features = ["async-std", "simple"]
 
+[[example]]
+name = "derive-two-tokio"
+path = "../../examples/derive_two_tokio.rs"
+crate-type = ["bin"]
+required-features = ["tokio", "derive"]
+
 [features]
 default = []
 simple = []
