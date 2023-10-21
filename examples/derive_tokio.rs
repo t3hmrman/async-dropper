@@ -43,7 +43,7 @@ impl AsyncDrop for AsyncThing {
     //     self.value = String::default();
     // }
 
-    // NOTE: below was not implemented since we want the default of DropFailAction::Contineue
+    // NOTE: below was not implemented since we want the default of DropFailAction::Continue
     // fn drop_fail_action(&self) -> DropFailAction;
 }
 
