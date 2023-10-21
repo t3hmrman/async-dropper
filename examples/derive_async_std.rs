@@ -34,7 +34,7 @@ impl AsyncDrop for AsyncThing {
         Duration::from_secs(5) // extended from default 3 seconds
     }
 
-    // NOTE: below was not implemented since we want the default of DropFailAction::Contineue
+    // NOTE: below was not implemented since we want the default of DropFailAction::Continue
     // fn drop_fail_action(&self) -> DropFailAction;
 }
 

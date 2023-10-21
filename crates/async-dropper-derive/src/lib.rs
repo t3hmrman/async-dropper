@@ -131,7 +131,7 @@ fn gen_impl(DeriveInput { ident, .. }: &DeriveInput) -> proc_macro2::TokenStream
         #[async_trait]
         impl Drop for #ident {
             fn drop(&mut self) {
-                // We consider a self that is completley equivalent to it's default version to be dropped
+                // We consider a self that is completely equivalent to it's default version to be dropped
                 let thing = #shared_default_name();
                 if *thing.lock().unwrap() == *self {
                     return;
@@ -143,29 +143,37 @@ fn gen_impl(DeriveInput { ident, .. }: &DeriveInput) -> proc_macro2::TokenStream
                 // Spawn a task to do the drop
                 let task = ::tokio::spawn(async move {
                     let drop_fail_action = <#ident as ::async_dropper::AsyncDrop>::drop_fail_action(&original);
-                    match ::tokio::time::timeout(
+                    let task_res = match ::tokio::time::timeout(
                         <#ident as ::async_dropper::AsyncDrop>::drop_timeout(&original),
                         <#ident as ::async_dropper::AsyncDrop>::async_drop(&mut original),
                     ).await {
-                        Err(e) => {
+                        // Task timed out
+                        Err(_) | Ok(Err(AsyncDropError::Timeout)) => {
                             match drop_fail_action {
-                                ::async_dropper::DropFailAction::Continue => original,
-                                ::async_dropper::DropFailAction::Panic => {
-                                    panic!("async drop failed: {e}");
-                                }
+                                ::async_dropper::DropFailAction::Continue => Ok(()),
+                                ::async_dropper::DropFailAction::Panic => Err("async drop timed out".to_string()),
                             }
                         },
-                        Ok(_) => original,
-                    }
+                        // Internal task error
+                        Ok(Err(AsyncDropError::UnexpectedError(e))) => Err(format!("async drop failed: {e}")),
+                        // Task completed successfully
+                        Ok(_) => Ok(()),
+                    };
+                    (original, task_res)
                 });
 
                 // Perform a synchronous wait
-                let mut original = ::tokio::task::block_in_place(|| ::tokio::runtime::Handle::current().block_on(task).unwrap());
+                let (mut original, task_res) = ::tokio::task::block_in_place(|| ::tokio::runtime::Handle::current().block_on(task).unwrap());
+
 
                 // After the async wait, we must reset all fields to the default (so future checks will fail)
                 <#ident as ::async_dropper::AsyncDrop>::reset(&mut original);
                 if *thing.lock().unwrap() != original {
                     panic!("after calling AsyncDrop::reset(), the object does *not* equal T::default()");
+                }
+
+                if let Err(e) = task_res {
+                    panic!("{e}");
                 }
             }
         }
@@ -181,7 +189,7 @@ fn gen_impl(DeriveInput { ident, .. }: &DeriveInput) -> proc_macro2::TokenStream
         #[async_trait]
         impl Drop for #ident {
             fn drop(&mut self) {
-                // We consider a self that is completley equivalent to it's default version to be dropped
+                // We consider a self that is completely equivalent to it's default version to be dropped
                 let thing = #shared_default_name();
                 if *thing.lock().unwrap() == *self {
                     return;
@@ -193,29 +201,36 @@ fn gen_impl(DeriveInput { ident, .. }: &DeriveInput) -> proc_macro2::TokenStream
                 // Spawn a task to do the drop
                 let task = ::async_std::task::spawn(async move {
                     let drop_fail_action = <#ident as ::async_dropper::AsyncDrop>::drop_fail_action(&original);
-                    match ::async_std::future::timeout(
+                    let task_res = match ::async_std::future::timeout(
                         <#ident as ::async_dropper::AsyncDrop>::drop_timeout(&original),
                         <#ident as ::async_dropper::AsyncDrop>::async_drop(&mut original),
                     ).await {
-                        Err(e) => {
+                        // Task timed out
+                        Err(_) | Ok(Err(AsyncDropError::Timeout)) => {
                             match drop_fail_action {
-                                ::async_dropper::DropFailAction::Continue => original,
-                                ::async_dropper::DropFailAction::Panic => {
-                                    panic!("async drop failed: {e}");
-                                }
+                                ::async_dropper::DropFailAction::Continue => Ok(()),
+                                ::async_dropper::DropFailAction::Panic => Err("async drop timed out".to_string()),
                             }
                         },
-                        Ok(_) => original,
-                    }
+                        // Internal task error
+                        Ok(Err(AsyncDropError::UnexpectedError(e))) => Err(format!("async drop failed: {e}")),
+                        // Task completed successfully
+                        Ok(_) => Ok(()),
+                    };
+                    (original, task_res)
                 });
 
                 // Perform synchronous wait
-                let mut original = ::futures::executor::block_on(task);
+                let (mut original, task_res) = ::futures::executor::block_on(task);
 
                 // Reset the task to ensure it won't trigger async drop behavior again
                 <#ident as ::async_dropper::AsyncDrop>::reset(&mut original);
                 if *thing.lock().unwrap() != original {
                     panic!("after calling AsyncDrop::reset(), the object does *not* equal T::default()");
+                }
+
+                if let Err(e) = task_res {
+                    panic!("{e}");
                 }
             }
         }
