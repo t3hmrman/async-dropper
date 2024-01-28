@@ -83,6 +83,7 @@ async fn test_dropper_timeout() {
 async fn test_derefs() {
     let inner = TestDropper::new(|| {}, None);
     let mut instance = AsyncDropper::new(inner);
+
     {
         let inn = &*instance;
         assert_eq!(inn.value, 0);
@@ -92,6 +93,7 @@ async fn test_derefs() {
         let inn = instance.inner();
         assert_eq!(inn.value, 0);
     }
+
     {
         let inn = &mut *instance;
         inn.value += 1;
