@@ -116,9 +116,9 @@ impl<T: AsyncDrop + Send> Drop for AsyncDropper<T> {
     fn drop(&mut self) {
         if !self.dropped {
             // This is the current instance.
+            self.dropped = true;
             // Grab timeout before mem::take since it replaces self with Default::default() which is None.
             let timeout = self.timeout;
-            self.dropped = true;
             let mut this = std::mem::take(self);
             // This is the Default instance created anew.
             self.dropped = true;
