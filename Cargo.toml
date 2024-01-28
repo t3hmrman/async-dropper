@@ -3,10 +3,12 @@ resolver = "2"
 members = [
   "crates/async-dropper",
   "crates/async-dropper-derive",
-  "crates/async-dropper-simple",
+  "crates/async-dropper-simple", 
+  "crates/macros_internal",
 ]
 
 [workspace.dependencies]
+async-scoped = "0.9.0"
 async-std = "1.12.0"
 tokio = "1.33.0"
 async-trait = "0.1.74"

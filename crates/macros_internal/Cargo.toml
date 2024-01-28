@@ -1,0 +1,14 @@
+[package]
+name = "macros_internal"
+version = "0.1.0"
+edition = "2021"
+description = "This is currently only being used in tests."
+
+[lib]
+proc-macro = true
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+quote.workspace = true
+syn.workspace = true

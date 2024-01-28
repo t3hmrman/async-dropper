@@ -14,8 +14,8 @@ A simple struct-wrapper (i.e. AsyncDropper<T>) based implementation of AsyncDrop
 
 [features]
 default = []
-tokio = ["dep:tokio"]
-async-std = ["dep:async-std"]
+tokio = ["dep:tokio", "dep:async-scoped", "async-scoped/use-tokio"]
+async-std = ["dep:async-std",  "dep:async-scoped", "async-scoped/use-async-std"]
 
 [dependencies]
 async-std = { workspace = true, optional = true }
@@ -26,11 +26,15 @@ tokio = { workspace = true, optional = true, features = [
 ] }
 futures.workspace = true
 async-trait.workspace = true
+async-scoped = { workspace = true, optional = true }
+proc-macro2 = "1.0.78"
 
 [build-dependencies]
 rustc_version = "0.4.0"
 
 [dev-dependencies]
+async-std = { workspace = true, features = ['attributes'] }
+macros_internal = { path = "../macros_internal" }
 tokio = { workspace = true, features = [
   "time",
   "macros",
