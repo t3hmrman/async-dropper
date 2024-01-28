@@ -58,7 +58,7 @@ impl<T: AsyncDrop + Send> AsyncDropper<T> {
 }
 
 /// It doesn't require default, this tradeoff means that you need to use `AsyncDropper::new` or `AsyncDropper::with_timeout`.
-/// Since `AsyncDropper::default()` doesn't create `T::default()` inner, we create a dummy Default instance om `std::mem::take` to be thrown away.
+/// Since `AsyncDropper::default()` doesn't create `T::default()` inner, we create a dummy Default instance on `std::mem::take` to be thrown away.
 impl<T> Default for AsyncDropper<T>
 where
     T: AsyncDrop + Send,
