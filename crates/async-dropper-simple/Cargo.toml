@@ -27,7 +27,6 @@ tokio = { workspace = true, optional = true, features = [
 futures.workspace = true
 async-trait.workspace = true
 async-scoped = { workspace = true, optional = true }
-proc-macro2 = "1.0.78"
 
 [build-dependencies]
 rustc_version = "0.4.0"
