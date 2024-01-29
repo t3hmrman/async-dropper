@@ -1,0 +1,14 @@
+name: Lint
+
+on:
+  pull_request:
+
+jobs:
+  ensure-conventional-commits:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Ensure conventional commits
+        uses: aevea/commitsar@916c7b483225a30d3a17f407fa25f5b25888ea69 # v0.20.2
