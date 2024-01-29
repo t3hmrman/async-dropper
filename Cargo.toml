@@ -4,7 +4,6 @@ members = [
   "crates/async-dropper",
   "crates/async-dropper-derive",
   "crates/async-dropper-simple", 
-  "crates/macros_internal",
 ]
 
 [workspace.dependencies]
