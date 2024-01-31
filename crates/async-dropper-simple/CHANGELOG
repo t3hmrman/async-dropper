@@ -1,6 +1,18 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [0.2.6] - 2024-01-31
+
+### Bug Fixes
+
+- Timeout usage
+
+### Features
+
+- Add inner(), inner_mut(), Deref/DerefMut impls
+- Remove static requirement by using async-scoped
+- Add no-default-bound feature
+
 ## [0.2.5] - 2023-10-20
 
 ### Bug Fixes
