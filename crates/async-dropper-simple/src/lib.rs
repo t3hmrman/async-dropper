@@ -58,11 +58,20 @@ impl<T: AsyncDrop + Default + Send + 'static> Drop for AsyncDropper<T> {
 impl<T: AsyncDrop + Default + Send + 'static> Drop for AsyncDropper<T> {
     fn drop(&mut self) {
         if !self.dropped {
+            // Set the original instance to be dropped
+            self.dropped = true;
+
+            // Save the timeout on the original instance
+            let timeout = self.timeout;
+
+            // Swap out the current instance with default
+            // (i.e. `this` is now original instance, and `self` is a default instance)
             let mut this = std::mem::take(self);
-            this.dropped = true;
+
+            // Set the default instance to note that it's dropped
+            self.dropped = true;
 
             // Create task
-            let timeout = self.timeout;
             let task = tokio::spawn(async move {
                 this.inner.async_drop().await;
             });
@@ -84,11 +93,20 @@ impl<T: AsyncDrop + Default + Send + 'static> Drop for AsyncDropper<T> {
 impl<T: AsyncDrop + Default + Send + 'static> Drop for AsyncDropper<T> {
     fn drop(&mut self) {
         if !self.dropped {
+            // Set the original instance to be dropped
+            self.dropped = true;
+
+            // Save the timeout on the original instance
+            let timeout = self.timeout;
+
+            // Swap out the current instance with default
+            // (i.e. `this` is now original instance, and `self` is a default instance)
             let mut this = std::mem::take(self);
-            this.dropped = true;
+
+            // Set the default instance to note that it's dropped
+            self.dropped = true;
 
             // Create task
-            let timeout = self.timeout.clone();
             let task = async_std::task::spawn(async move {
                 this.inner.async_drop().await;
             });
