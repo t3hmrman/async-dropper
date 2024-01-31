@@ -89,8 +89,10 @@ test-unit:
     @{{just}} ensure-binary cargo-nextest CARGO_NEXTEST
     @{{cargo}} nextest run -F tokio,derive     -E 'kind(lib)'
     @{{cargo}} nextest run -F tokio,simple     -E 'kind(lib)'
+    @{{cargo}} nextest run -F tokio,simple,no-default-bound -E 'kind(lib)'
     @{{cargo}} nextest run -F async-std,derive -E 'kind(lib)'
     @{{cargo}} nextest run -F async-std,simple -E 'kind(lib)'
+    @{{cargo}} nextest run -F async-std,simple,no-default-bound -E 'kind(lib)'
 
 # Run unit tests continuously
 test-unit-watch:
