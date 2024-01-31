@@ -8,6 +8,7 @@ members = [
 
 [workspace.dependencies]
 async-std = "1.12.0"
+async-scoped = "0.9.0"
 tokio = "1.33.0"
 async-trait = "0.1.74"
 proc-macro2 = "1.0.69"
