@@ -12,13 +12,13 @@ pub trait AsyncDrop {
 
 #[derive(Default)]
 #[allow(dead_code)]
-pub struct AsyncDropper<T: AsyncDrop + Default + Send + 'static> {
+pub struct AsyncDropper<T: AsyncDrop + Default + Send> {
     dropped: bool,
     timeout: Option<Duration>,
     inner: T,
 }
 
-impl<T: AsyncDrop + Default + Send + 'static> AsyncDropper<T> {
+impl<T: AsyncDrop + Default + Send> AsyncDropper<T> {
     pub fn new(inner: T) -> Self {
         Self {
             dropped: false,
@@ -67,7 +67,7 @@ where
 }
 
 #[cfg(all(not(feature = "tokio"), not(feature = "async-std")))]
-impl<T: AsyncDrop + Default + Send + 'static> Drop for AsyncDropper<T> {
+impl<T: AsyncDrop + Default + Send> Drop for AsyncDropper<T> {
     fn drop(&mut self) {
         compile_error!(
             "either 'async-std' or 'tokio' features must be enabled for the async-dropper crate"
@@ -76,7 +76,7 @@ impl<T: AsyncDrop + Default + Send + 'static> Drop for AsyncDropper<T> {
 }
 
 #[cfg(all(feature = "async-std", feature = "tokio"))]
-impl<T: AsyncDrop + Default + Send + 'static> Drop for AsyncDropper<T> {
+impl<T: AsyncDrop + Default + Send> Drop for AsyncDropper<T> {
     fn drop(&mut self) {
         compile_error!(
             "'async-std' and 'tokio' features cannot both be specified for the async-dropper crate"
@@ -86,9 +86,11 @@ impl<T: AsyncDrop + Default + Send + 'static> Drop for AsyncDropper<T> {
 
 #[cfg(all(feature = "tokio", not(feature = "async-std")))]
 #[cfg_attr(docsrs, doc(cfg(feature = "tokio")))]
-impl<T: AsyncDrop + Default + Send + 'static> Drop for AsyncDropper<T> {
+impl<T: AsyncDrop + Default + Send> Drop for AsyncDropper<T> {
     fn drop(&mut self) {
         if !self.dropped {
+            use async_scoped::TokioScope;
+
             // Set the original instance to be dropped
             self.dropped = true;
 
@@ -103,27 +105,35 @@ impl<T: AsyncDrop + Default + Send + 'static> Drop for AsyncDropper<T> {
             self.dropped = true;
 
             // Create task
-            let task = tokio::spawn(async move {
-                this.inner.async_drop().await;
-            });
-
-            tokio::task::block_in_place(|| match timeout {
+            match timeout {
+                // If a timeout was specified, use it when performing async_drop
                 Some(d) => {
-                    let _ = futures::executor::block_on(tokio::time::timeout(d, task));
+                    TokioScope::scope_and_block(|s| {
+                        s.spawn(tokio::time::timeout(d, async move {
+                            this.inner.async_drop().await;
+                        }))
+                    });
                 }
+                // If no timeout was specified, perform async_drop() indefinitely
                 None => {
-                    let _ = futures::executor::block_on(task);
+                    TokioScope::scope_and_block(|s| {
+                        s.spawn(async move {
+                            this.inner.async_drop().await;
+                        })
+                    });
                 }
-            });
+            }
         }
     }
 }
 
 #[cfg(all(feature = "async-std", not(feature = "tokio")))]
 #[cfg_attr(docsrs, doc(cfg(feature = "async-std")))]
-impl<T: AsyncDrop + Default + Send + 'static> Drop for AsyncDropper<T> {
+impl<T: AsyncDrop + Default + Send> Drop for AsyncDropper<T> {
     fn drop(&mut self) {
         if !self.dropped {
+            use async_scoped::AsyncStdScope;
+
             // Set the original instance to be dropped
             self.dropped = true;
 
@@ -137,19 +147,24 @@ impl<T: AsyncDrop + Default + Send + 'static> Drop for AsyncDropper<T> {
             // Set the default instance to note that it's dropped
             self.dropped = true;
 
-            // Create task
-            let task = async_std::task::spawn(async move {
-                this.inner.async_drop().await;
-            });
-
             match timeout {
+                // If a timeout was specified, use it when performing async_drop
                 Some(d) => {
-                    let _ = futures::executor::block_on(async_std::future::timeout(d, task));
+                    AsyncStdScope::scope_and_block(|s| {
+                        s.spawn(async_std::future::timeout(d, async move {
+                            this.inner.async_drop().await;
+                        }))
+                    });
                 }
+                // If no timeout was specified, perform async_drop() indefinitely
                 None => {
-                    let _ = futures::executor::block_on(task);
+                    AsyncStdScope::scope_and_block(|s| {
+                        s.spawn(async move {
+                            this.inner.async_drop().await;
+                        })
+                    });
                 }
-            };
+            }
         }
     }
 }
