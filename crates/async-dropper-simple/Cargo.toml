@@ -16,6 +16,7 @@ A simple struct-wrapper (i.e. AsyncDropper<T>) based implementation of AsyncDrop
 default = []
 tokio = ["dep:tokio", "dep:async-scoped", "async-scoped/use-tokio"]
 async-std = ["dep:async-std", "dep:async-scoped", "async-scoped/use-async-std"]
+no-default-bound = []
 
 [dependencies]
 async-scoped = { workspace = true, optional = true }
@@ -32,6 +33,7 @@ async-trait.workspace = true
 rustc_version = "0.4.0"
 
 [dev-dependencies]
+async-std = { workspace = true, features = [ "attributes", "tokio1" ] }
 tokio = { workspace = true, features = [
   "time",
   "macros",

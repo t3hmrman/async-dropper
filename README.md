@@ -92,6 +92,12 @@ You can run the example and see the output:
 cargo run --example simple-tokio --features=tokio
 ```
 
+### Don't like the `Default` requirement?
+
+It [was suggested](https://github.com/t3hmrman/async-dropper/issues/12#issuecomment-1913642636) that for certain large structs, it may not be convenient to implement `Default` in order to use the simple `AsyncDropper`.
+
+As of version `0.2.6`, `async-dropper-simple` has a feature flag called `no-default-bound` which allows you to skip the `Default` bound on your `T` (in `AsyncDropper<T>`), by using an inner `Option<T>` (thanks @beckend!).
+
 ### `async_dropper::derive`
 
 The derive macro is a novel (and possibly foolhardy) attempt to implement `AsyncDrop` without actually wrapping the existing struct.
