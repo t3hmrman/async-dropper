@@ -2,6 +2,7 @@
 //! The code in this file was shamelessly stolen from
 //! https://stackoverflow.com/questions/71541765/rust-async-drop
 
+use std::ops::{Deref, DerefMut};
 use std::time::Duration;
 
 #[async_trait::async_trait]
@@ -32,6 +33,36 @@ impl<T: AsyncDrop + Default + Send + 'static> AsyncDropper<T> {
             timeout: Some(timeout),
             inner,
         }
+    }
+
+    /// Get a reference to the inner data
+    pub fn inner(&self) -> &T {
+        &self.inner
+    }
+
+    /// Get a mutable refrence to inner data
+    pub fn inner_mut(&mut self) -> &mut T {
+        &mut self.inner
+    }
+}
+
+impl<T> Deref for AsyncDropper<T>
+where
+    T: AsyncDrop + Send + Default,
+{
+    type Target = T;
+
+    fn deref(&self) -> &T {
+        self.inner()
+    }
+}
+
+impl<T> DerefMut for AsyncDropper<T>
+where
+    T: AsyncDrop + Send + Default,
+{
+    fn deref_mut(&mut self) -> &mut T {
+        self.inner_mut()
     }
 }
 
