@@ -17,11 +17,11 @@ sha := `git rev-parse --short HEAD`
 
 # Print the current version
 print-version:
-    @echo -n "{{version}}"
+    @printf "{{version}}"
 
 # Print the current SHA
 print-sha:
-    @echo -n "{{sha}}"
+    @printf "{{sha}}"
 
 # Ensure a binary is present
 ensure-binary bin env_name:
