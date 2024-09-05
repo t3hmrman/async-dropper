@@ -17,7 +17,7 @@ proc-macro = true
 
 [features]
 default = []
-tokio = ["dep:tokio"]
+tokio = []
 async-std = ["dep:async-std"]
 
 [dependencies]
@@ -26,7 +26,6 @@ async-trait.workspace = true
 proc-macro2.workspace = true
 quote.workspace = true
 syn.workspace = true
-tokio = { workspace = true, optional = true }
 
 [package.metadata.docs.rs]
 all-features = false
