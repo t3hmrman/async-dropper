@@ -130,3 +130,16 @@ pub trait AsyncDrop: Default + PartialEq + Eq + ResetDefault {
         DropFailAction::Continue
     }
 }
+
+// Create an impl for AsyncDropError to allow ? to be used with AsyncDropError
+impl From<Box<dyn std::error::Error>> for AsyncDropError {
+    fn from(value: Box<dyn std::error::Error>) -> Self {
+        AsyncDropError::UnexpectedError(value)
+    }
+}
+// Create a impl for anyhow::Error to allow ? to be used with AsyncDropError
+impl From<anyhow::Error> for AsyncDropError {
+    fn from(value: anyhow::Error) -> Self {
+        AsyncDropError::UnexpectedError(Box::new(value))
+    }
+}
