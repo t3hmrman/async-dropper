@@ -42,6 +42,16 @@ If you're editing `Cargo.toml` by hand, **choose one** of the following lines:
 > `async-dropper` does not allow using both `async-std` and `tokio` features at the same time (see [the FAQ below](#FAQ)).
 > You *can*, however, use both the `simple` and `derive` features at the same time
 
+### Other features
+
+Here are some other features you might be interested in using:
+
+| Crate           | Feature  | Description                                                                  |
+|-----------------|----------|------------------------------------------------------------------------------|
+| `async-dropper` | `anyhow` | Enable [`anyhow`][crate-anyhow]-related functionality (ex. `From` instances) |
+
+[crate-anyhow]: https://crates.io/crates/anyhow
+
 ## Quickstart
 
 ### `async_dropper::simple`
