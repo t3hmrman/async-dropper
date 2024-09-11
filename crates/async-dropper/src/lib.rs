@@ -137,6 +137,8 @@ impl From<Box<dyn std::error::Error>> for AsyncDropError {
         AsyncDropError::UnexpectedError(value)
     }
 }
+
+#[cfg(feature = "anyhow")]
 // Create a impl for anyhow::Error to allow ? to be used with AsyncDropError
 impl From<anyhow::Error> for AsyncDropError {
     fn from(value: anyhow::Error) -> Self {

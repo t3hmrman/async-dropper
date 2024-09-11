@@ -56,12 +56,13 @@ async-std = [
   "async-dropper-derive/async-std",
   "async-dropper-simple/async-std",
 ]
+anyhow = [ "dep:anyhow" ]
 
 [dependencies]
-anyhow.workspace = true
-async-trait.workspace = true
+anyhow = { workspace = true, optional = true }
 async-std = { workspace = true, optional = true }
-futures.workspace = true
+async-trait = { workspace = true }
+futures = { workspace = true }
 
 tokio = { workspace = true, optional = true, features = [
   "rt",
@@ -85,4 +86,4 @@ async-std = { workspace = true, features = ["attributes"] }
 [package.metadata.docs.rs]
 all-features = false
 no-default-features = true
-features = ["tokio", "derive"]
+features = ["tokio", "derive", "anyhow"]

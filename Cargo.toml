@@ -7,12 +7,12 @@ members = [
 ]
 
 [workspace.dependencies]
-async-std = "1.12.0"
+anyhow = "1.0.87"
 async-scoped = "0.9.0"
-tokio = "1.33.0"
+async-std = "1.12.0"
 async-trait = "0.1.74"
+futures = "0.3.28"
 proc-macro2 = "1.0.69"
 quote = "1.0.33"
 syn = "2.0.38"
-futures = "0.3.28"
-anyhow = "1.0.87"
+tokio = "1.33.0"
