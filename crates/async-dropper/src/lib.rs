@@ -83,6 +83,7 @@ compile_error!("both 'derive' and 'simple' features cannot be enabled at the sam
 #[cfg(all(not(feature = "simple"), not(feature = "derive")))]
 compile_error!("either the 'derive' feature or the 'simple' feature must be enabled");
 
+/// Errors that are thrown during the execution of an `async_drop()`
 #[derive(Debug)]
 pub enum AsyncDropError {
     UnexpectedError(Box<dyn std::error::Error>),
@@ -103,8 +104,13 @@ pub trait ResetDefault {
     fn reset_to_default(&mut self);
 }
 
-/// The operative trait that enables AsyncDrop functionality.
-/// Normally, implementing only async_drop(&mut self) and reset(&mut self) is necessary.
+/// Enables `AsyncDrop` functionality.
+///
+/// Normally, implementing only `async_drop(&mut self)` is necessary.
+///
+/// An implementation of `reset(&mut self)` is generated, and can be overriden where necessary, 
+/// with the primary requirement that `reset` returns the `T` being reset to a state where it is *identical*
+/// to a `T::default()`.
 #[async_trait::async_trait]
 #[cfg(feature = "derive")]
 pub trait AsyncDrop: Default + PartialEq + Eq + ResetDefault {
