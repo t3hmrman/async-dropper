@@ -1,6 +1,45 @@
+//! `AsyncDrop` macro & implementation
+
 use proc_macro2::TokenStream;
 use syn::{DataEnum, DataStruct, DataUnion, DeriveInput, Fields, FieldsNamed};
 
+/// `AsyncDrop` enables asynchronous `drop` behavior for a given type
+///
+/// Deriving `AsyncDrop` enables a given type `T` to be asynchronously dropped, automatically
+/// when normal `Drop` would be called.
+///
+/// Essentially, this works by running an asynchronous task synchronously at drop time, with the
+/// caveat that the `T` being dropped is able to be compared to `T::default()` (and swapped with one).
+///
+/// See the [crate README][crate-readme] for more details.
+///
+/// # Example
+///
+/// ```rust,ignore
+/// #[derive(Debug, Default, PartialEq, Eq, AsyncDrop)]
+/// struct AsyncThing {
+///     value: String,
+/// }
+///
+/// /// Implementation of [AsyncDrop] that specifies the actual behavior
+/// #[async_trait]
+/// impl AsyncDrop for AsyncThing {
+///     async fn async_drop(&mut self) -> Result<(), AsyncDropError> {
+///         // Wait 2 seconds then "succeed"
+///         tokio::time::sleep(Duration::from_secs(2)).await;
+///         Ok(())
+///     }
+/// }
+///
+/// #[tokio::main]
+/// #[allow(dead_code)]
+/// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+///     drop(AsyncThing { value: String::from("test")});
+///     Ok(())
+/// }
+/// ```
+///
+/// [crate-readme]: <https://crates.io/crates/async-dropper>
 #[proc_macro_derive(AsyncDrop)]
 pub fn derive_async_drop(items: proc_macro::TokenStream) -> proc_macro::TokenStream {
     match syn::parse2::<DeriveInput>(items.into()) {
