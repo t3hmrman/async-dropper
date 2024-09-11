@@ -1,6 +1,6 @@
 #![cfg_attr(all(doc, channel = "nightly"), feature(doc_cfg))]
 //! The code in this file was shamelessly stolen from
-//! https://stackoverflow.com/questions/71541765/rust-async-drop
+//! <https://stackoverflow.com/questions/71541765/rust-async-drop>
 
 #[async_trait::async_trait]
 pub trait AsyncDrop {
