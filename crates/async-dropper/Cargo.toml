@@ -58,6 +58,7 @@ async-std = [
 ]
 
 [dependencies]
+anyhow.workspace = true
 async-trait.workspace = true
 async-std = { workspace = true, optional = true }
 futures.workspace = true
