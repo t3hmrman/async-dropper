@@ -1,7 +1,5 @@
-use std::{
-    result::Result,
-    time::Duration,
-};
+use std::result::Result;
+use std::time::Duration;
 
 use async_dropper::{AsyncDrop, AsyncDropError};
 use async_trait::async_trait;
