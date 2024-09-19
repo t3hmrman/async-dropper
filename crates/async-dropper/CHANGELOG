@@ -1,6 +1,25 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [0.3.2] - 2024-09-19
+
+### Bug Fixes
+
+- Add anyhow dep
+
+### Documentation
+
+- Add documentation around anyhow feature
+- Improve documentation
+
+### Features
+
+- Added error conversions
+
+### Refactor
+
+- Make anyhow an optional dependency by feature
+
 ## [0.3.1] - 2023-10-26
 
 ### Miscellaneous Tasks
