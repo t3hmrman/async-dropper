@@ -1,6 +1,13 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [0.2.7] - 2024-09-19
+
+### Bug Fixes
+
+- Cfg flag usage for nightly detection
+- Docs lint for link to stackoverflow
+
 ## [0.2.6] - 2024-01-31
 
 ### Bug Fixes
