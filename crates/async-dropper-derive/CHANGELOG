@@ -1,6 +1,16 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [0.3.2] - 2024-09-19
+
+### Documentation
+
+- Improve documentation on macro
+
+### Refactor
+
+- Drop tokio dependency
+
 ## [0.3.1] - 2023-10-26
 
 ### Bug Fixes
