@@ -75,6 +75,8 @@ async-dropper-derive = { path = "../async-dropper-derive", version = "0.3.2" }
 async-dropper-simple = { path = "../async-dropper-simple", version = "0.2.7" }
 
 [dev-dependencies]
+anyhow = { workspace = true }
+uuid = { workspace = true }
 tokio = { workspace = true, features = [
   "time",
   "macros",

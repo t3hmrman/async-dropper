@@ -167,7 +167,6 @@ fn gen_impl(DeriveInput { ident, .. }: &DeriveInput) -> proc_macro2::TokenStream
     let shared_default_name = make_shared_default_name(ident);
     quote::quote!(
         #[automatically_derived]
-        #[async_trait]
         impl Drop for #ident {
             fn drop(&mut self) {
                 // We consider a self that is completely equivalent to it's default version to be dropped
@@ -225,7 +224,6 @@ fn gen_impl(DeriveInput { ident, .. }: &DeriveInput) -> proc_macro2::TokenStream
     let shared_default_name = make_shared_default_name(ident);
     quote::quote!(
         #[automatically_derived]
-        #[async_trait]
         impl Drop for #ident {
             fn drop(&mut self) {
                 // We consider a self that is completely equivalent to it's default version to be dropped
