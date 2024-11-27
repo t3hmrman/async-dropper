@@ -70,7 +70,7 @@ impl<T: AsyncDrop + Send> Default for AsyncDropper<T> {
 
 impl<T> Deref for AsyncDropper<T>
 where
-    T: AsyncDrop + Send + Default,
+    T: AsyncDrop + Send,
 {
     type Target = T;
 
@@ -81,7 +81,7 @@ where
 
 impl<T> DerefMut for AsyncDropper<T>
 where
-    T: AsyncDrop + Send + Default,
+    T: AsyncDrop + Send,
 {
     fn deref_mut(&mut self) -> &mut T {
         self.inner_mut()
