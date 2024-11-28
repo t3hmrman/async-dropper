@@ -102,10 +102,10 @@ test-unit-watch:
 
 test-int:
     @{{just}} ensure-binary cargo-nextest CARGO_NEXTEST
-    @{{cargo}} nextest run -F tokio,derive     -E 'kind(test)'
-    @{{cargo}} nextest run -F tokio,simple     -E 'kind(test)'
-    @{{cargo}} nextest run -F async-std,derive -E 'kind(test)'
-    @{{cargo}} nextest run -F async-std,simple -E 'kind(test)'
+    @{{cargo}} nextest run --no-tests=pass -F tokio,derive     -E 'kind(test)'
+    @{{cargo}} nextest run --no-tests=pass -F tokio,simple     -E 'kind(test)'
+    @{{cargo}} nextest run --no-tests=pass -F async-std,derive -E 'kind(test)'
+    @{{cargo}} nextest run --no-tests=pass -F async-std,simple -E 'kind(test)'
 
 test-examples:
     @{{cargo}} run --example simple-tokio --features=tokio,simple
