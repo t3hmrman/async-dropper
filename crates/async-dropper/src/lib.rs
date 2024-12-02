@@ -108,7 +108,7 @@ pub trait ResetDefault {
 ///
 /// Normally, implementing only `async_drop(&mut self)` is necessary.
 ///
-/// An implementation of `reset(&mut self)` is generated, and can be overriden where necessary, 
+/// An implementation of `reset(&mut self)` is generated, and can be overriden where necessary,
 /// with the primary requirement that `reset` returns the `T` being reset to a state where it is *identical*
 /// to a `T::default()`.
 #[async_trait::async_trait]
